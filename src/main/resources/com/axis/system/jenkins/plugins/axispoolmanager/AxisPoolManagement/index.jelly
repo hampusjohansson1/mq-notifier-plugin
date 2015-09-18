@@ -1,0 +1,60 @@
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout"
+         xmlns:f="/lib/form">
+    <l:layout title="${%Axis Pool Management Status and Configuration}" norefresh="true"
+              permission="${it.requiredPermission}">
+        <l:header>
+        </l:header>
+        <l:side-panel>
+            <l:tasks>
+                <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}"/>
+            </l:tasks>
+        </l:side-panel>
+        <l:main-panel>
+            <div style="overflow:auto; width: 80%;">
+                <img src="${rootURL}/plugin/axis-pool-manager/images/icon.png" style="float: left;"/>
+                <h1 style="float: left; margin-left: 10px">Axis Pool Management</h1>
+            </div>
+            <j:set var="descriptor" value="${it.descriptor}"/>
+            <j:set var="config" value="${it.config}"/>
+            <f:form method="post" action="configSubmit" name="config">
+                <f:section title="${%Global Configuration}">
+                    <f:entry title="${%Pool Manager RESTAPI URI}">
+                        <f:textbox name="restApiURI" value="${config.restApiURI}"/>
+                    </f:entry>
+                    <f:entry title="${%Default maximum time}" description="Default maximum time in hours">
+                        <div style="width: 100px; display: inline-block;">
+                            <f:number name="maximumTimeout" value="${config.maximumTimeout}"/>
+                        </div>
+                    </f:entry>
+                    <f:entry title="${%Default number of checkout retries}"
+                             description="Default number of checkout retries when failing to check out resource">
+                        <div style="width: 100px; display: inline-block;">
+                            <f:number name="maxCheckOutRetries"
+                                      value="${config.maxCheckoutRetries}"/>
+                        </div>
+                    </f:entry>
+                </f:section>
+                <f:block>
+                    <f:submit value="${%Save}"/>
+                </f:block>
+            </f:form>
+            <br/>
+            <br/>
+            <f:section title="${%Currently Checked Out Resources}"/>
+            <j:set var="manager" value="${it.resourceManager}"/>
+            <j:forEach items="${manager.checkedOutResources}" var="i">
+                <div style="background-color: #EEE;">
+                    <h2 style="padding: 10px 0px 0px 10px;">${i.build}</h2>
+                    <div style="background-color: #CCC;">
+                        <j:forEach items="${i.resourceEntities}" var="j">
+                            <!--
+                            Todo: Different types should be able to supply there own status.jelly for inclusion
+                            !-->
+                            <p style="padding: 5px 5px; margin: 0px">${j}</p>
+                        </j:forEach>
+                    </div>
+                </div>
+            </j:forEach>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

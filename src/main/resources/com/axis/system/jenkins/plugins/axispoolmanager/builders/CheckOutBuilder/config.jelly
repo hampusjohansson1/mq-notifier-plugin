@@ -1,0 +1,19 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form">
+    <f:entry title="Resource Group Identifier" field="resourceGroupId"
+             description="Identifier for the resources being checked out. Use this identifier when checking in the resources again.">
+        <div style="width: 100px; display: inline-block;">
+            <f:number default="1"/>
+        </div>
+    </f:entry>
+
+    <f:entry title="Select resources to reserve">
+        <f:hetero-list
+                descriptors="${descriptor.resourceDescriptors}"
+                items="${instance.resourceEntities}"
+                name="resources"
+                hasHeader="true"
+                addCaption="Add resource to check out"/>
+    </f:entry>
+</j:jelly>

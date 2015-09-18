@@ -1,0 +1,15 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form">
+    <f:entry title="Pool name" field="poolName">
+        <f:textbox/>
+    </f:entry>
+    <f:entry title="Product name" field="productName">
+        <f:textbox/>
+    </f:entry>
+    <f:entry title="Number of products" field="numberOfProducts">
+        <div style="width: 100px;">
+            <f:number default="1"/>
+        </div>
+    </f:entry>
+</j:jelly>
