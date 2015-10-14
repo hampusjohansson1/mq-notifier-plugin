@@ -29,8 +29,14 @@ public final class CheckInBuilder extends Builder {
     /**
      * Indicates whether we should check in all checked out resources for the build or just one resource group?
      */
-    enum CheckInType {
+    public enum CheckInType {
+        /**
+         * Check in a single resource group.
+         */
         SINGLE,
+        /**
+         * Check in all previously checked out resources by this build.
+         */
         ALL
     }
 
