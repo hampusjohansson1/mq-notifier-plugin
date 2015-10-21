@@ -107,4 +107,18 @@
             <url>http://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>containers.se.axis.com</id>
+            <name>containers.se.axis.com-releases</name>
+            <url>http://containers.se.axis.com:8080/artifactory/plugins-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>containers.se.axis.com</id>
+            <name>containers.se.axis.com-snapshots</name>
+            <url>http://containers.se.axis.com:8080/artifactory/plugins-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
