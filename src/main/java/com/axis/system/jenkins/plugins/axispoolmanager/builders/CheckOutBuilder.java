@@ -124,10 +124,10 @@ public final class CheckOutBuilder extends Builder {
             listener.fatalError(e.getMessage());
             return false;
         } catch (CheckOutException e) {
-            listener.fatalError("Fatal error while checking out DUTs", e.getMessage());
+            listener.fatalError(e.getMessage());
             return false;
         } catch (CheckInException e) {
-            listener.fatalError("Fatal error while checking in DUTs: ", e.getMessage());
+            listener.fatalError(e.getMessage());
             return false;
         } catch (IOException e) {
             e.printStackTrace();
