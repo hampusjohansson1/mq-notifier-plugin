@@ -99,7 +99,6 @@ public final class AxisPoolParameterAction implements EnvironmentContributingAct
         }
     }
 
-
     @Override
     public String getIconFileName() {
      return "/plugin/axis-pool-manager/images/icon.png";

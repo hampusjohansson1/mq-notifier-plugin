@@ -3,6 +3,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.builders;
 import com.axis.system.jenkins.plugins.axispoolmanager.AxisResourceManager;
 import com.axis.system.jenkins.plugins.axispoolmanager.ResourceGroup;
 import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction;
+import com.axis.system.jenkins.plugins.axispoolmanager.actions.ResourceJsonEnvironmentAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
@@ -108,6 +109,10 @@ public final class CheckOutBuilder extends Builder {
                 // also means the user gets easy access to the DUTs meta data for every build.
                 build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
                         parameters, build, resourceGroupId));
+                // JSONified action struct. We only need one which will be rebuilt when the environment is built.
+                if (build.getActions(ResourceJsonEnvironmentAction.class).isEmpty()) {
+                    build.addAction(new ResourceJsonEnvironmentAction(build));
+                }
                 listener.getLogger().println("Successfully checked out the complete resource group: "
                         + resourceGroup.toString());
             }
@@ -133,7 +138,14 @@ public final class CheckOutBuilder extends Builder {
     }
 
     private String getEnvKeyFormat(String id, String key) {
-        return "DUT_" + id + "_" + key.toUpperCase();
+        AxisResourceManager manager = AxisResourceManager.getInstance();
+        int rollingId = 0;
+        for (ResourceGroup resourceGroup : manager.getCheckedOutResources()) {
+            for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
+                rollingId++;
+            }
+        }
+        return "DUT" + rollingId + "_" + key.toUpperCase();
     }
 
     /**
