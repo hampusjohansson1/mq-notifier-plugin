@@ -1,0 +1,25 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+    xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+    xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <l:layout title="${it.displayName}">
+    <j:invokeStatic var="currentThread" className="java.lang.Thread" method="currentThread" />
+    <j:invoke var="buildClass" on="${currentThread.contextClassLoader}" method="loadClass">
+      <j:arg value="hudson.model.Run"/>
+    </j:invoke>
+    <j:set var="build" value="${request.findAncestorObject(buildClass)}" />
+		<st:include page="sidepanel.jelly" it="${build}" />
+		<l:main-panel>
+			<div style="overflow:auto; width: 80%;">
+				<img src="${rootURL}/plugin/axis-pool-manager/images/icon.png" style="float: left;"/>
+				<h1 style="float: left; margin-left: 10px">${%Build} ${build.displayName} - Checked Out Resource Data</h1>
+			</div>
+			<l:pane title="${%Parameters}" width="3">
+				<j:forEach var="parameterValue" items="${it.parameters}">
+					<st:include it="${parameterValue}"
+						page="value.jelly" />
+				</j:forEach>
+			</l:pane>
+		</l:main-panel>
+  </l:layout>
+</j:jelly>

@@ -2,6 +2,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.builders;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.AxisResourceManager;
 import com.axis.system.jenkins.plugins.axispoolmanager.ResourceGroup;
+import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import hudson.Extension;
 import hudson.Launcher;
@@ -64,11 +65,13 @@ public final class CheckInBuilder extends Builder {
                 case ALL:
                     listener.getLogger().println("Checking in all resources...");
                     axisResourceManager.checkInAll(build);
+                    AxisPoolParameterAction.disableEnvVars(build);
                     listener.getLogger().println("Successfully checked in all resources.");
                     break;
                 case SINGLE:
                     listener.getLogger().println("Checking in ResourceGroup: " + getResourceGroupId());
                     ResourceGroup resourceGroup = axisResourceManager.checkInGroup(build, getResourceGroupId());
+                    AxisPoolParameterAction.disableEnvVars(build, getResourceGroupId());
                     listener.getLogger().println("Successfully checked in the complete resource group: "
                             + resourceGroup.toString());
                     break;

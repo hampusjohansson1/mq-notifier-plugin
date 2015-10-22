@@ -106,9 +106,8 @@ public final class CheckOutBuilder extends Builder {
                 }
                 // We expose the data as environment variables through the use of a ParameterAction. This
                 // also means the user gets easy access to the DUTs meta data for every build.
-                // TODO: Do not expose environment variables after check in.
                 build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
-                        parameters));
+                        parameters, build, resourceGroupId));
                 listener.getLogger().println("Successfully checked out the complete resource group: "
                         + resourceGroup.toString());
             }

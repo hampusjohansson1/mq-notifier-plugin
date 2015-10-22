@@ -1,5 +1,6 @@
 package com.axis.system.jenkins.plugins.axispoolmanager;
 
+import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
@@ -24,6 +25,7 @@ public final class AxisResourcesGarbageCollector extends RunListener<Run> {
         try {
             if (run instanceof AbstractBuild) {
                 axisResourceManager.checkInAll((AbstractBuild) run);
+                AxisPoolParameterAction.disableEnvVars(run);
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();
