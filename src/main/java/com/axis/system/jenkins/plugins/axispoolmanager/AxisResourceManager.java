@@ -98,6 +98,7 @@ public final class AxisResourceManager extends Plugin {
     public void start() throws Exception {
         LOGGER.info("Starting Axis Pool Manager plug-in");
         super.start();
+        super.load();
     }
 
     @Override
