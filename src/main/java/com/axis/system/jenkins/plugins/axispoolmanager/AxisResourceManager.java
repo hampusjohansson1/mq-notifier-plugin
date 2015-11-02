@@ -4,6 +4,8 @@ import com.axis.system.jenkins.plugins.axispoolmanager.config.GlobalConfig;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
+import com.axis.system.jenkins.plugins.axispoolmanager.rest.RequestFields;
+import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckInAllResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.Plugin;
@@ -54,6 +56,16 @@ public final class AxisResourceManager extends Plugin {
         }
     }
 
+    /**
+     * Checks out all resources in a resource group.
+     *
+     * @param resourceGroup Resource Group
+     * @param userReference The user owning the resource
+     * @return true if successful
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public boolean checkOut(ResourceGroup resourceGroup, String userReference)
             throws URISyntaxException, IOException, InterruptedException {
         // TODO: We should probably bookkeep the RESTApi end points in a separate file.
@@ -99,6 +111,15 @@ public final class AxisResourceManager extends Plugin {
         LOGGER.info("Starting Axis Pool Manager plug-in");
         super.start();
         super.load();
+        try {
+            checkInAll();
+        } catch (URISyntaxException e) {
+            LOGGER.warn("Could not build URI for checking in all products", e);
+        } catch (CheckInException e) {
+            LOGGER.warn("Could not check in all products", e);
+        } catch (UnknownHostException e) {
+            LOGGER.warn("Could not fetch host name when checking in all products", e);
+        }
     }
 
     @Override
@@ -110,11 +131,11 @@ public final class AxisResourceManager extends Plugin {
     public List<NameValuePair> getBasicURICheckoutParameters(AbstractBuild build, String userReference)
             throws IOException, InterruptedException {
         ArrayList param = new ArrayList<NameValuePair>();
-        param.add(new BasicNameValuePair("server_host", java.net.InetAddress.getLocalHost().getHostName()));
-        param.add(new BasicNameValuePair("user_reference", userReference));
-        param.add(new BasicNameValuePair("configuration_name", build.getProject().getFullName()));
-        param.add(new BasicNameValuePair("configuration_build_nbr_number", build.getId()));
-        param.add(new BasicNameValuePair("max_termination_time", String.valueOf(getConfig().getMaximumTimeout())));
+        param.add(new BasicNameValuePair(RequestFields.SERVER_HOST, java.net.InetAddress.getLocalHost().getHostName()));
+        param.add(new BasicNameValuePair(RequestFields.USER_REFERENCE, userReference));
+        param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_NAME, build.getProject().getFullName()));
+        param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_BUILD_NBR_NUMBER, build.getId()));
+        param.add(new BasicNameValuePair(RequestFields.MAX_TERMINATION_TIME, String.valueOf(getConfig().getMaximumTimeout())));
         return param;
     }
 
@@ -124,6 +145,12 @@ public final class AxisResourceManager extends Plugin {
                 checkInGroup(resourceGroup);
             }
         }
+    }
+
+    public List<NameValuePair> getCheckInAllURIParameters() throws UnknownHostException {
+        ArrayList param = new ArrayList<NameValuePair>();
+        param.add(new BasicNameValuePair(RequestFields.SERVER_HOST, java.net.InetAddress.getLocalHost().getHostName()));
+        return param;
     }
 
     public void checkInGroup(ResourceGroup resourceGroup) throws URISyntaxException, CheckInException {
@@ -154,6 +181,30 @@ public final class AxisResourceManager extends Plugin {
             }
         }
         checkedOutResources.remove(resourceGroup);
+    }
+
+    public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException {
+        URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkin_all_products");
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        uriBuilder.setParameters(getCheckInAllURIParameters());
+        HttpGet req = new HttpGet(uriBuilder.build());
+        req.addHeader("accept", "application/json");
+        try {
+            RestResponse response = httpClient.execute(req, new RestCheckInAllResponseHandler());
+            switch (response.getResultType()) {
+                case SUCCESS:
+                    LOGGER.info("Successfully checked in all resources");
+                    break;
+                case FATAL:
+                    throw new CheckInException("Could not check in all resources: " + response.getMessage());
+                default:
+                    throw new CheckInException("Unexpected state: " + response.getMessage());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CheckInException("Could not contact pool manager", e);
+        }
+        checkedOutResources.clear();
     }
 
     public ResourceGroup checkInGroup(AbstractBuild build, int resourceGroupId) throws CheckInException, URISyntaxException {
