@@ -36,7 +36,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class AxisResourceManager extends Plugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(AxisResourceManager.class);
-    private List<ResourceGroup> checkedOutResources = new CopyOnWriteArrayList<ResourceGroup>();
+    private transient List<ResourceGroup> checkedOutResources = new CopyOnWriteArrayList<ResourceGroup>();
     private GlobalConfig config;
 
     /**
