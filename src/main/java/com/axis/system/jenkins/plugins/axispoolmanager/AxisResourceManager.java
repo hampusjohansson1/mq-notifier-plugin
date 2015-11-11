@@ -10,6 +10,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponse
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.Plugin;
 import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -66,7 +67,7 @@ public final class AxisResourceManager extends Plugin {
      * @throws IOException
      * @throws InterruptedException
      */
-    public boolean checkOut(ResourceGroup resourceGroup, String userReference)
+    public boolean checkOut(ResourceGroup resourceGroup, String userReference, BuildListener listener)
             throws URISyntaxException, IOException, InterruptedException {
         // TODO: We should probably bookkeep the RESTApi end points in a separate file.
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkout_product");
@@ -82,11 +83,13 @@ public final class AxisResourceManager extends Plugin {
             req.addHeader("accept", "application/json");
             RestResponse response;
             try {
+                listener.getLogger().println(req.toString());
                 response = httpClient.execute(req, new RestCheckOutResponseHandler());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new CheckOutException("Could not contact pool manager", e);
             }
+            listener.getLogger().println(response.getMessage());
             switch (response.getResultType()) {
                 case SUCCESS:
                     resourceEntity.setManagerMetaData(response.getJSONData());

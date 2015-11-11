@@ -82,12 +82,12 @@ public final class CheckOutBuilder extends Builder {
         try {
             listener.getLogger().println("Checking out " + resourceGroup.toString());
             String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
-            while (!axisResourceManager.checkOut(resourceGroup, buildTag) && retries-- > 0) {
+            while (!axisResourceManager.checkOut(resourceGroup, buildTag, listener) && retries-- > 0) {
                 // Some entities may have been checked out. Let's try to check them in.
                 // TODO: This can be removed when we have a real multi checkout transaction support in the DUT manager
                 axisResourceManager.checkInGroup(resourceGroup);
-                listener.getLogger().println("The specified resources are currently not available. Retrying in "
-                        + TimeUnit.MILLISECONDS.toSeconds(retryTimer) + " seconds (" + retries + " retries left).");
+                listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
+                        + " seconds (" + retries + " retries left).");
                 Thread.sleep(retryTimer);
             }
             if (retries <= 0) {
