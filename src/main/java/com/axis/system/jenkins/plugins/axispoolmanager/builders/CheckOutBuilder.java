@@ -47,6 +47,7 @@ public final class CheckOutBuilder extends Builder {
     private static long retryTimer = TimeUnit.MINUTES.toMillis(1);
     private final int resourceGroupId;
     private final List<ResourceEntity> resources;
+    private final int leaseTime;
 
     /**
      * DataBoundContructor matching fields in config.jelly.
@@ -55,9 +56,16 @@ public final class CheckOutBuilder extends Builder {
      * @param resources       Resource entries from .jelly HetrogenList
      */
     @DataBoundConstructor
+    public CheckOutBuilder(int resourceGroupId, List<ResourceEntity> resources, int leaseTime) {
+        this.resourceGroupId = resourceGroupId;
+        this.resources = resources;
+        this.leaseTime = leaseTime;
+    }
+
     public CheckOutBuilder(int resourceGroupId, List<ResourceEntity> resources) {
         this.resourceGroupId = resourceGroupId;
         this.resources = resources;
+        this.leaseTime = AxisResourceManager.getInstance().getConfig().getMaximumTimeout();
     }
 
     /**
@@ -67,6 +75,10 @@ public final class CheckOutBuilder extends Builder {
      */
     public Integer getResourceGroupId() {
         return resourceGroupId;
+    }
+
+    public Integer getLeaseTime() {
+        return leaseTime;
     }
 
     @Override
@@ -82,7 +94,7 @@ public final class CheckOutBuilder extends Builder {
         try {
             listener.getLogger().println("Checking out " + resourceGroup.toString());
             String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
-            while (!axisResourceManager.checkOut(resourceGroup, buildTag, listener) && retries-- > 0) {
+            while (!axisResourceManager.checkOut(resourceGroup, buildTag, listener, getLeaseTime()) && retries-- > 0) {
                 // Some entities may have been checked out. Let's try to check them in.
                 // TODO: This can be removed when we have a real multi checkout transaction support in the DUT manager
                 axisResourceManager.checkInGroup(resourceGroup);
@@ -182,6 +194,10 @@ public final class CheckOutBuilder extends Builder {
 
         public String getDisplayName() {
             return "Check Out Resources";
+        }
+
+        public Integer getDefaultLeaseTime() {
+            return AxisResourceManager.getInstance().getConfig().getMaximumTimeout();
         }
 
         @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")

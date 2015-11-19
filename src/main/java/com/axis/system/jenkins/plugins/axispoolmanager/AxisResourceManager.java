@@ -67,13 +67,14 @@ public final class AxisResourceManager extends Plugin {
      * @throws IOException
      * @throws InterruptedException
      */
-    public boolean checkOut(ResourceGroup resourceGroup, String userReference, BuildListener listener)
+    public boolean checkOut(ResourceGroup resourceGroup, String userReference, BuildListener listener, int leaseTime)
             throws URISyntaxException, IOException, InterruptedException {
         // TODO: We should probably bookkeep the RESTApi end points in a separate file.
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkout_product");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
             uriBuilder.setParameters(resourceEntity.getURICheckOutParameters());
+            uriBuilder.addParameter("max_termination_time", Integer.toString(leaseTime));
             try {
                 uriBuilder.addParameters(getBasicURICheckoutParameters(resourceGroup.getBuild(), userReference));
             } catch (UnknownHostException e) {
@@ -138,7 +139,6 @@ public final class AxisResourceManager extends Plugin {
         param.add(new BasicNameValuePair(RequestFields.USER_REFERENCE, userReference));
         param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_NAME, build.getProject().getFullName()));
         param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_BUILD_NBR_NUMBER, build.getId()));
-        param.add(new BasicNameValuePair(RequestFields.MAX_TERMINATION_TIME, String.valueOf(getConfig().getMaximumTimeout())));
         return param;
     }
 

@@ -25,6 +25,13 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
      * @return {@link CheckOutBuilder} populated with Resource Entities {@link ResourceEntity}
      */
     @DslExtensionMethod(context = StepContext.class)
+    public Object resourceCheckOut(int resourceGroup, int leaseTime, Runnable closure) {
+        CheckOutDslContext context = new CheckOutDslContext();
+        executeInContext(closure, context);
+        return new CheckOutBuilder(resourceGroup, context.resourceEntities, leaseTime);
+    }
+
+    @DslExtensionMethod(context = StepContext.class)
     public Object resourceCheckOut(int resourceGroup, Runnable closure) {
         CheckOutDslContext context = new CheckOutDslContext();
         executeInContext(closure, context);

@@ -23,10 +23,6 @@ public final class RequestFields {
      * Build ID.
      */
     public static final String CONFIGURATION_BUILD_NBR_NUMBER = "configuration_build_nbr_number";
-    /**
-     * The product name.
-     */
-    public static final String MAX_TERMINATION_TIME = "max_termination_time";
 
     private RequestFields() { }
 }

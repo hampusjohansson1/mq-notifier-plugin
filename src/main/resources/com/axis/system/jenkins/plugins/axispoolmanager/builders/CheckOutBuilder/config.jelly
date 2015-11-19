@@ -16,4 +16,13 @@
                 hasHeader="true"
                 addCaption="Add resource to check out"/>
     </f:entry>
+    <f:section title="Advanced Project Options">
+        <f:advanced>
+          <f:entry title="Lease time (hours)" field="leaseTime">
+              <div style="width: 100px;">
+                  <f:number default="${descriptor.defaultLeaseTime}"/>
+              </div>
+          </f:entry>
+        </f:advanced>
+    </f:section>
 </j:jelly>
