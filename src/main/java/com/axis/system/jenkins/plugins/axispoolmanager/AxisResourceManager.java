@@ -13,6 +13,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -27,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Plugin main entry point.
@@ -37,6 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class AxisResourceManager extends Plugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(AxisResourceManager.class);
+    private static final int HTTP_TIMEOUT = 30;
     private transient List<ResourceGroup> checkedOutResources = new CopyOnWriteArrayList<ResourceGroup>();
     private GlobalConfig config;
 
@@ -55,6 +58,10 @@ public final class AxisResourceManager extends Plugin {
             LOGGER.error("Error, Jenkins could not be found, so no plugin!");
             return null;
         }
+    }
+
+    private RequestConfig getRequestConfig() {
+        return RequestConfig.custom().setConnectTimeout((int) TimeUnit.SECONDS.toMillis(HTTP_TIMEOUT)).build();
     }
 
     /**
@@ -82,6 +89,7 @@ public final class AxisResourceManager extends Plugin {
             }
             HttpGet req = new HttpGet(uriBuilder.build());
             req.addHeader("accept", "application/json");
+            req.setConfig(getRequestConfig());
             RestResponse response;
             try {
                 listener.getLogger().println(req.toString());
@@ -165,6 +173,7 @@ public final class AxisResourceManager extends Plugin {
             }
             uriBuilder.setParameters(resourceEntity.getURICheckInParameters());
             HttpGet req = new HttpGet(uriBuilder.build());
+            req.setConfig(getRequestConfig());
             req.addHeader("accept", "application/json");
             try {
                 RestResponse response = httpClient.execute(req, new RestCheckOutResponseHandler());
@@ -191,6 +200,7 @@ public final class AxisResourceManager extends Plugin {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         uriBuilder.setParameters(getCheckInAllURIParameters());
         HttpGet req = new HttpGet(uriBuilder.build());
+        req.setConfig(getRequestConfig());
         req.addHeader("accept", "application/json");
         try {
             RestResponse response = httpClient.execute(req, new RestCheckInAllResponseHandler());
