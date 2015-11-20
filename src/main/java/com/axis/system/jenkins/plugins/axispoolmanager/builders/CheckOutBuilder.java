@@ -89,7 +89,7 @@ public final class CheckOutBuilder extends Builder {
             return false;
         }
 
-        ResourceGroup resourceGroup = new ResourceGroup(build, getResourceGroupId(), getResourceEntities());
+        ResourceGroup resourceGroup = new ResourceGroup(build, getResourceGroupId(), getCopyOfResourceEntities());
         int retries = axisResourceManager.getConfig().getMaxCheckoutRetries();
         while (retries-- > 0) {
             try {
@@ -102,7 +102,7 @@ public final class CheckOutBuilder extends Builder {
                 if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime())) {
                     // A successful check-out. Add DUT information to environment variables.
                     ArrayList parameters = new ArrayList<StringParameterValue>();
-                    for (ResourceEntity resourceEntity : resources) {
+                    for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
                         String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.IDENTIFIER);
                         for (Map.Entry<String, Object> entry
                                 : (Set<Map.Entry<String, Object>>) resourceEntity.getManagerMetaData().entrySet()) {
@@ -171,15 +171,19 @@ public final class CheckOutBuilder extends Builder {
     }
 
     /**
-     * Entities to check out. Can never be null.
+     * Clone entities before check out. Can never be null.
      *
      * @return resourceEntities
      */
-    public List<ResourceEntity> getResourceEntities() {
+    private List<ResourceEntity> getCopyOfResourceEntities() {
         if (resources == null) {
-            return new LinkedList<ResourceEntity>();
+            return new ArrayList<ResourceEntity>();
         }
-        return resources;
+        List<ResourceEntity> deepClone = new ArrayList(resources.size());
+        for (ResourceEntity resourceEntity : resources) {
+            deepClone.add(resourceEntity.getCopy());
+        }
+        return deepClone;
     }
 
     @Override

@@ -20,6 +20,17 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
 
     public abstract List<NameValuePair> getURICheckInParameters();
 
+    /**
+     * Ugh. Jenkins allows parallel jobs to share the same _instance_ of the checkout builder,
+     * but we also need to use the ResourceEntities as a storage for meta data.
+     *
+     * I also want to avoid clone() which is discouraged since we lose control over derived
+     * classes (Object already implements clone).
+     *
+     * @see CheckOutBuilder.getCopyOfResourceEntities()
+     */
+    public abstract ResourceEntity getCopy();
+
     public final void setManagerMetaData(JSONObject managerMetaData) {
         this.managerMetaData = managerMetaData;
     }

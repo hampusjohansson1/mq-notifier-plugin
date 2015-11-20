@@ -34,6 +34,11 @@ public final class ExactProductResource extends ResourceEntity {
     }
 
     @Override
+    public ResourceEntity getCopy() {
+        return new ExactProductResource(ipAddress, macAddress);
+    }
+
+    @Override
     public List<NameValuePair> getURICheckOutParameters() {
         ArrayList param = new ArrayList<NameValuePair>();
         param.add(new BasicNameValuePair("ip", getIpAddress()));
