@@ -11,7 +11,6 @@ import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponse
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.Plugin;
 import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
