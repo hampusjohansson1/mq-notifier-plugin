@@ -3,6 +3,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager;
 import com.axis.system.jenkins.plugins.axispoolmanager.config.GlobalConfig;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RequestFields;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckInAllResponseHandler;
@@ -74,7 +75,7 @@ public final class AxisResourceManager extends Plugin {
      * @throws IOException
      * @throws InterruptedException
      */
-    public boolean checkOut(ResourceGroup resourceGroup, String userReference, BuildListener listener, int leaseTime)
+    public boolean checkOut(ResourceGroup resourceGroup, String userReference, int leaseTime)
             throws URISyntaxException, IOException, InterruptedException {
         // TODO: We should probably bookkeep the RESTApi end points in a separate file.
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkout_product");
@@ -92,13 +93,11 @@ public final class AxisResourceManager extends Plugin {
             req.setConfig(getRequestConfig());
             RestResponse response;
             try {
-                listener.getLogger().println(req.toString());
                 response = httpClient.execute(req, new RestCheckOutResponseHandler());
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new CheckOutException("Could not contact pool manager", e);
+                throw new TransientErrorException("Could not contact pool manager", e);
             }
-            listener.getLogger().println(response.getMessage());
             switch (response.getResultType()) {
                 case SUCCESS:
                     resourceEntity.setManagerMetaData(response.getJSONData());
@@ -108,7 +107,8 @@ public final class AxisResourceManager extends Plugin {
                 case FATAL:
                     throw new CheckOutException("Could not check out resource: " + response.getMessage());
                 case RETRY:
-                    return false;
+                    // Do not log to LOGGER here. It would spam jenkins log as this is quite common to end up here.
+                    throw new TransientErrorException("Could not check out resource: " + response.getMessage());
                 default:
                     LOGGER.error("Unexpected state during checkout: " + response.getResultType());
                     throw new CheckOutException("Unexpected state during check out!");
@@ -150,7 +150,7 @@ public final class AxisResourceManager extends Plugin {
         return param;
     }
 
-    public void checkInAll(AbstractBuild build) throws URISyntaxException, CheckInException {
+    public void checkInAll(AbstractBuild build) throws URISyntaxException, CheckInException, TransientErrorException {
         for (ResourceGroup resourceGroup : checkedOutResources) {
             if (resourceGroup.getBuild().equals(build)) {
                 checkInGroup(resourceGroup);
@@ -164,7 +164,7 @@ public final class AxisResourceManager extends Plugin {
         return param;
     }
 
-    public void checkInGroup(ResourceGroup resourceGroup) throws URISyntaxException, CheckInException {
+    public void checkInGroup(ResourceGroup resourceGroup) throws URISyntaxException, CheckInException, TransientErrorException {
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkin_product");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
@@ -189,13 +189,13 @@ public final class AxisResourceManager extends Plugin {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new CheckInException("Could not contact pool manager", e);
+                throw new TransientErrorException("Could not contact pool manager", e);
             }
         }
         checkedOutResources.remove(resourceGroup);
     }
 
-    public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException {
+    public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException, TransientErrorException {
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkin_all_products");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         uriBuilder.setParameters(getCheckInAllURIParameters());
@@ -215,12 +215,13 @@ public final class AxisResourceManager extends Plugin {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new CheckInException("Could not contact pool manager", e);
+            throw new TransientErrorException("Could not contact pool manager", e);
         }
         checkedOutResources.clear();
     }
 
-    public ResourceGroup checkInGroup(AbstractBuild build, int resourceGroupId) throws CheckInException, URISyntaxException {
+    public ResourceGroup checkInGroup(AbstractBuild build, int resourceGroupId) throws CheckInException,
+            TransientErrorException, URISyntaxException {
         for (ResourceGroup resourceGroup : checkedOutResources) {
             if (resourceGroup.getBuild().equals(build) && resourceGroup.getId() == resourceGroupId) {
                 checkInGroup(resourceGroup);

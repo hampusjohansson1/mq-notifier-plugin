@@ -22,6 +22,11 @@ public final class GlobalConfig {
      */
     public static final int DEFAULT_CHECK_OUT_RETRIES = 10;
 
+    /**
+     * Default time between check outs. In milliseconds.
+     */
+    public static final int RETRY_MILLIS = 60 * 1000;
+
     private String restApiURI;
     private int maximumTimeout;
     private int maxCheckoutRetries;

@@ -4,6 +4,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.AxisResourceManager;
 import com.axis.system.jenkins.plugins.axispoolmanager.ResourceGroup;
 import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -16,6 +17,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.concurrent.TimeUnit;
 
 import java.net.URISyntaxException;
 
@@ -60,33 +62,51 @@ public final class CheckInBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
-        try {
-            switch (getCheckInType()) {
-                case ALL:
-                    listener.getLogger().println("Checking in all resources...");
-                    axisResourceManager.checkInAll(build);
-                    AxisPoolParameterAction.disableEnvVars(build);
-                    listener.getLogger().println("Successfully checked in all resources.");
-                    break;
-                case SINGLE:
-                    listener.getLogger().println("Checking in ResourceGroup: " + getResourceGroupId());
-                    ResourceGroup resourceGroup = axisResourceManager.checkInGroup(build, getResourceGroupId());
-                    AxisPoolParameterAction.disableEnvVars(build, getResourceGroupId());
-                    listener.getLogger().println("Successfully checked in the complete resource group: "
-                            + resourceGroup.toString());
-                    break;
-                default:
-                    LOGGER.warn("Unknown checkInType: " + getCheckInType());
+
+        int retries = axisResourceManager.getConfig().getMaxCheckoutRetries();
+        while (retries-- > 0) {
+            try {
+                switch (getCheckInType()) {
+                    case ALL:
+                        listener.getLogger().println("Checking in all resources...");
+                        axisResourceManager.checkInAll(build);
+                        AxisPoolParameterAction.disableEnvVars(build);
+                        listener.getLogger().println("Successfully checked in all resources.");
+                        break;
+                    case SINGLE:
+                        listener.getLogger().println("Checking in ResourceGroup: " + getResourceGroupId());
+                        ResourceGroup resourceGroup = axisResourceManager.checkInGroup(build, getResourceGroupId());
+                        AxisPoolParameterAction.disableEnvVars(build, getResourceGroupId());
+                        listener.getLogger().println("Successfully checked in the complete resource group: "
+                                + resourceGroup.toString());
+                        break;
+                    default:
+                        LOGGER.warn("Unknown checkInType: " + getCheckInType());
+                }
+                return true;
+            } catch (URISyntaxException e) {
+                listener.fatalError("Could not construct URI. Please check global configuration for AxisPoolManager: "
+                        + e.getMessage());
+                return false;
+            } catch (CheckInException e) {
+                listener.error("Could not check in resources to pool.");
+                return false;
+            } catch (TransientErrorException e) {
+                listener.getLogger().println(e.getMessage());
             }
-        } catch (URISyntaxException e) {
-            listener.fatalError("Could not construct URI. Please check global configuration for AxisPoolManager: "
-                    + e.getMessage());
-            return false;
-        } catch (CheckInException e) {
-            listener.error("Could not check in resources to pool.");
-            return false;
+
+            int retryTimer = axisResourceManager.getConfig().RETRY_MILLIS;
+            listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
+                    + " seconds (" + retries + " retries left).");
+            try {
+                Thread.sleep(retryTimer);
+            } catch (InterruptedException e) {
+                listener.fatalError(e.getMessage());
+                return false;
+            }
         }
-        return true;
+        listener.fatalError("Out of retries. Failed to check in resources. Failing build.");
+        return false;
     }
 
     /**

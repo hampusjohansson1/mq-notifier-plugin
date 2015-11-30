@@ -45,10 +45,10 @@ public final class RestCheckOutResponseHandler implements ResponseHandler<RestRe
                 String errorMessage = json.getString(ResponseFields.MESSAGE);
 
                 RestResponse.ResultType resultType;
-                if (errorType.equals(CheckOutErrors.NO_MATCH)) {
-                    resultType = RestResponse.ResultType.FATAL;
-                } else {
+                if (errorType.equals(CheckOutErrors.TRY_AGAIN)) {
                     resultType = RestResponse.ResultType.RETRY;
+                } else {
+                    resultType = RestResponse.ResultType.FATAL;
                 }
                 return RestResponse.fromError(responseMsg, errorMessage, resultType);
             }

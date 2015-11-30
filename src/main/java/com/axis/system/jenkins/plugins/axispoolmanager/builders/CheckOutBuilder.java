@@ -6,6 +6,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameter
 import com.axis.system.jenkins.plugins.axispoolmanager.actions.ResourceJsonEnvironmentAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,7 +45,6 @@ public final class CheckOutBuilder extends Builder {
     private static final String UNKNOWN_USER_REFERENCE = "jenkins-unknown";
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckOutBuilder.class);
 
-    private static long retryTimer = TimeUnit.MINUTES.toMillis(1);
     private final int resourceGroupId;
     private final List<ResourceEntity> resources;
     private final int leaseTime;
@@ -91,62 +91,72 @@ public final class CheckOutBuilder extends Builder {
 
         ResourceGroup resourceGroup = new ResourceGroup(build, getResourceGroupId(), getResourceEntities());
         int retries = axisResourceManager.getConfig().getMaxCheckoutRetries();
-        try {
-            listener.getLogger().println("Checking out " + resourceGroup.toString());
-            String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
-            while (!axisResourceManager.checkOut(resourceGroup, buildTag, listener, getLeaseTime()) && retries-- > 0) {
+        while (retries-- > 0) {
+            try {
                 // Some entities may have been checked out. Let's try to check them in.
                 // TODO: This can be removed when we have a real multi checkout transaction support in the DUT manager
                 axisResourceManager.checkInGroup(resourceGroup);
-                listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
-                        + " seconds (" + retries + " retries left).");
-                Thread.sleep(retryTimer);
-            }
-            if (retries <= 0) {
-                listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
-                return false;
-            } else {
-                // A successful check-out. Add DUT information to environment variables.
-                ArrayList parameters = new ArrayList<StringParameterValue>();
-                for (ResourceEntity resourceEntity : resources) {
-                    String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.IDENTIFIER);
-                    for (Map.Entry<String, Object> entry
-                            : (Set<Map.Entry<String, Object>>) resourceEntity.getManagerMetaData().entrySet()) {
-                        String envKey = getEnvKeyFormat(resourceId, entry.getKey());
-                        String envValue = entry.getValue().toString();
-                        parameters.add(new StringParameterValue(envKey, envValue));
-                    }
-                }
-                // We expose the data as environment variables through the use of a ParameterAction. This
-                // also means the user gets easy access to the DUTs meta data for every build.
-                build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
-                        parameters, build, resourceGroupId));
-                // JSONified action struct. We only need one which will be rebuilt when the environment is built.
-                if (build.getActions(ResourceJsonEnvironmentAction.class).isEmpty()) {
-                    build.addAction(new ResourceJsonEnvironmentAction(build));
-                }
-                listener.getLogger().println("Successfully checked out the complete resource group: "
-                        + resourceGroup.toString());
-            }
-        } catch (URISyntaxException e) {
-            listener.fatalError("Could not construct URI. Please check global configuration for Pool Manager RESTApi URI: "
-                    + e.getMessage());
-            return false;
-        } catch (InterruptedException e) {
-            listener.fatalError(e.getMessage());
-            return false;
-        } catch (CheckOutException e) {
-            listener.fatalError(e.getMessage());
-            return false;
-        } catch (CheckInException e) {
-            listener.fatalError(e.getMessage());
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
 
-        return true;
+                listener.getLogger().println("Checking out " + resourceGroup.toString());
+                String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
+                if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime())) {
+                    // A successful check-out. Add DUT information to environment variables.
+                    ArrayList parameters = new ArrayList<StringParameterValue>();
+                    for (ResourceEntity resourceEntity : resources) {
+                        String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.IDENTIFIER);
+                        for (Map.Entry<String, Object> entry
+                                : (Set<Map.Entry<String, Object>>) resourceEntity.getManagerMetaData().entrySet()) {
+                            String envKey = getEnvKeyFormat(resourceId, entry.getKey());
+                            String envValue = entry.getValue().toString();
+                            parameters.add(new StringParameterValue(envKey, envValue));
+                        }
+                    }
+                    // We expose the data as environment variables through the use of a ParameterAction. This
+                    // also means the user gets easy access to the DUTs meta data for every build.
+                    build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
+                            parameters, build, resourceGroupId));
+                    // JSONified action struct. We only need one which will be rebuilt when the environment is built.
+                    if (build.getActions(ResourceJsonEnvironmentAction.class).isEmpty()) {
+                        build.addAction(new ResourceJsonEnvironmentAction(build));
+                    }
+                    listener.getLogger().println("Successfully checked out the complete resource group: "
+                            + resourceGroup.toString());
+                    return true;
+                }
+
+            } catch (URISyntaxException e) {
+                listener.fatalError("Could not construct URI. Please check global configuration for Pool Manager RESTApi URI: "
+                        + e.getMessage());
+                return false;
+            } catch (InterruptedException e) {
+                listener.fatalError(e.getMessage());
+                return false;
+            } catch (TransientErrorException e) {
+                // Log the reason for the unsuccessful checkout and try again.
+                listener.getLogger().println(e.getMessage());
+            } catch (CheckOutException e) {
+                // Log the reason for the unsuccessful checkout and quit
+                listener.error(e.getMessage());
+                return false;
+            } catch (CheckInException e) {
+                listener.fatalError(e.getMessage());
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            int retryTimer = axisResourceManager.getConfig().RETRY_MILLIS;
+            listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
+                    + " seconds (" + retries + " retries left).");
+            try {
+                Thread.sleep(retryTimer);
+            } catch (InterruptedException e) {
+                listener.fatalError(e.getMessage());
+                return false;
+            }
+        }
+        listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
+        return false;
     }
 
     private String getEnvKeyFormat(String id, String key) {
