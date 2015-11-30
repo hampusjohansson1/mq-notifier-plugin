@@ -16,21 +16,17 @@ import java.util.List;
  * @see <a href="http://staginglab.staging.rnd.axis.com/pool/">staginglab.staging.rnd.axis.com</a>
  */
 public final class ExactProductResource extends ResourceEntity {
-    private final String ipAddress;
+    // ipAddress here for backward compability reasons.
+    private transient  final String ipAddress = null;
     private final String macAddress;
 
     @DataBoundConstructor
-    public ExactProductResource(String ipAddress, String macAddress) {
-        this.ipAddress = ipAddress;
+    public ExactProductResource(String macAddress) {
         this.macAddress = macAddress;
     }
 
     public String getMacAddress() {
         return macAddress;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
     }
 
     @Override
@@ -41,7 +37,6 @@ public final class ExactProductResource extends ResourceEntity {
     @Override
     public List<NameValuePair> getURICheckOutParameters() {
         ArrayList param = new ArrayList<NameValuePair>();
-        param.add(new BasicNameValuePair("ip", getIpAddress()));
         param.add(new BasicNameValuePair("mac", getMacAddress()));
         return param;
     }
@@ -55,8 +50,7 @@ public final class ExactProductResource extends ResourceEntity {
 
     @Override
     public String toString() {
-        return String.format(this.getClass().getSimpleName() + ": [IP Address: %s, MAC Address: %s]",
-                getIpAddress(), getMacAddress());
+        return String.format(this.getClass().getSimpleName() + ": [MAC Address: %s]", getMacAddress());
     }
 
     /**
@@ -68,7 +62,7 @@ public final class ExactProductResource extends ResourceEntity {
 
         @Override
         public String getDisplayName() {
-            return "Checkout a Single Product by IP & MAC";
+            return "Checkout a Single Product by MAC";
         }
     }
 

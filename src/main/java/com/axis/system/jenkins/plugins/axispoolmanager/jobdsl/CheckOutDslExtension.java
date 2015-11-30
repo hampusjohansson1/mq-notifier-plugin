@@ -46,8 +46,8 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
         /**
          * DSL Mapping for {@link ExactProductResource}.
          */
-        public void exactProduct(String ipAddress, String macAddress) {
-            resourceEntities.add(new ExactProductResource(ipAddress, macAddress));
+        public void exactProduct(String macAddress) {
+            resourceEntities.add(new ExactProductResource(macAddress));
         }
 
         /**
