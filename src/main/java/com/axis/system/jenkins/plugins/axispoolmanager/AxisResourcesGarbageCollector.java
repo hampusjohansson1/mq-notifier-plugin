@@ -2,6 +2,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
 import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
@@ -30,6 +31,8 @@ public final class AxisResourcesGarbageCollector extends RunListener<Run> {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (CheckInException e) {
+            e.printStackTrace();
+        } catch (TransientErrorException e) {
             e.printStackTrace();
         }
     }

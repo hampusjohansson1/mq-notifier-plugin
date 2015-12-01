@@ -17,7 +17,7 @@ import java.util.List;
  */
 public final class ExactProductResource extends ResourceEntity {
     // ipAddress here for backward compability reasons.
-    private transient  final String ipAddress = null;
+    private final transient String ipAddress = null;
     private final String macAddress;
 
     @DataBoundConstructor
@@ -31,7 +31,7 @@ public final class ExactProductResource extends ResourceEntity {
 
     @Override
     public ResourceEntity getCopy() {
-        return new ExactProductResource(ipAddress, macAddress);
+        return new ExactProductResource(ipAddress);
     }
 
     @Override

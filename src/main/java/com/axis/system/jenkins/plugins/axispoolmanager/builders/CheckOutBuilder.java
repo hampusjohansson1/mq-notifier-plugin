@@ -69,6 +69,18 @@ public final class CheckOutBuilder extends Builder {
     }
 
     /**
+     * Entities to check out. Can never be null.
+     *
+     * @return resourceEntities
+     */
+    public List<ResourceEntity> getResourceEntities() {
+        if (resources == null) {
+            return new LinkedList<ResourceEntity>();
+        }
+        return resources;
+    }
+
+    /**
      * Used for building / looking up all-or-nothing check out / check in groups.
      *
      * @return The resource group Id.
