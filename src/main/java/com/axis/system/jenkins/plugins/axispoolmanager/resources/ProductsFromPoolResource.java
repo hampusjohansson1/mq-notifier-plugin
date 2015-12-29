@@ -57,6 +57,7 @@ public final class ProductsFromPoolResource extends ResourceEntity {
         ArrayList param = new ArrayList<NameValuePair>();
         param.add(new BasicNameValuePair("product", getProductName()));
         param.add(new BasicNameValuePair("pool", getPoolName()));
+        param.add(new BasicNameValuePair("number", Integer.toString(getNumberOfProducts())));
         return param;
     }
 

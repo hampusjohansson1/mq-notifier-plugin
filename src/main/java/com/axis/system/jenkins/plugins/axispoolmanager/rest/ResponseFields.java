@@ -25,6 +25,10 @@ public final class ResponseFields {
      */
     public static final String MESSAGE = "message";
     /**
+     * List of hosts (duts) returned from the pool management Rest Api.
+     */
+    public static final String HOSTS = "hosts";
+    /**
      * The product name.
      */
     public static final String PRODUCT = "product";

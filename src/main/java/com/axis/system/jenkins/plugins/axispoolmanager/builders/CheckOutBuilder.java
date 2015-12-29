@@ -21,6 +21,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.slf4j.Logger;
@@ -112,15 +113,20 @@ public final class CheckOutBuilder extends Builder {
                 listener.getLogger().println("Checking out " + resourceGroup.toString());
                 String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
                 if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime())) {
+                    int rollingId = 1;
                     // A successful check-out. Add DUT information to environment variables.
                     ArrayList parameters = new ArrayList<StringParameterValue>();
                     for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-                        String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.IDENTIFIER);
-                        for (Map.Entry<String, Object> entry
-                                : (Set<Map.Entry<String, Object>>) resourceEntity.getManagerMetaData().entrySet()) {
-                            String envKey = getEnvKeyFormat(resourceId, entry.getKey());
-                            String envValue = entry.getValue().toString();
-                            parameters.add(new StringParameterValue(envKey, envValue));
+                        String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.REFERENCE);
+                        JSONArray hosts = resourceEntity.getManagerMetaData().getJSONArray(ResponseFields.HOSTS);
+                        for (Object o : hosts) {
+                            JSONObject host = (JSONObject) o;
+                            for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) host.entrySet()) {
+                                String envKey  = "DUT_" + rollingId + "_" + entry.getKey().toUpperCase();
+                                String envValue = entry.getValue().toString();
+                                parameters.add(new StringParameterValue(envKey, envValue));
+                            }
+                            rollingId++;
                         }
                     }
                     // We expose the data as environment variables through the use of a ParameterAction. This
@@ -169,17 +175,6 @@ public final class CheckOutBuilder extends Builder {
         }
         listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
         return false;
-    }
-
-    private String getEnvKeyFormat(String id, String key) {
-        AxisResourceManager manager = AxisResourceManager.getInstance();
-        int rollingId = 0;
-        for (ResourceGroup resourceGroup : manager.getCheckedOutResources()) {
-            for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-                rollingId++;
-            }
-        }
-        return "DUT" + rollingId + "_" + key.toUpperCase();
     }
 
     /**
