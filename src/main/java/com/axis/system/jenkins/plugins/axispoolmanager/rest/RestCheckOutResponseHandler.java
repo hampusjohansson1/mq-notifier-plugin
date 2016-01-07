@@ -53,6 +53,6 @@ public final class RestCheckOutResponseHandler implements ResponseHandler<RestRe
                 return RestResponse.fromError(responseMsg, errorMessage, resultType);
             }
         }
-        return RestResponse.fromError("Unexpected response from server", RestResponse.ResultType.FATAL);
+        return RestResponse.fromError("Unexpected response from server", RestResponse.ResultType.RETRY);
     }
 }

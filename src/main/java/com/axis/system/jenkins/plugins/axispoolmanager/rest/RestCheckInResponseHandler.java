@@ -44,6 +44,6 @@ public final class RestCheckInResponseHandler implements ResponseHandler<RestRes
                 }
             }
         }
-        return RestResponse.fromError("Unexpected response from server", RestResponse.ResultType.FATAL);
+        return RestResponse.fromError("Unexpected response from server", RestResponse.ResultType.RETRY);
     }
 }
