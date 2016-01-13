@@ -53,7 +53,7 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
         /**
          * DSL Mapping for {@link ProductsFromPoolResource}.
          */
-        public void productsFromPool(String poolName, String productName, int numberOfProducts) {
+        public void productsFromPool(String poolName, String productName, String numberOfProducts) {
             resourceEntities.add(new ProductsFromPoolResource(poolName, productName, numberOfProducts));
         }
 
@@ -61,7 +61,7 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
          * DSL Mapping for {@link ProductsFromPoolResource} that defaults to 1 resource check out.
          */
         public void productsFromPool(String poolName, String productName) {
-            resourceEntities.add(new ProductsFromPoolResource(poolName, productName, 1));
+            resourceEntities.add(new ProductsFromPoolResource(poolName, productName, "1"));
         }
     }
 }

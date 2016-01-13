@@ -8,8 +8,8 @@
         <f:textbox/>
     </f:entry>
     <f:entry title="Number of products" field="numberOfProducts">
-        <div style="width: 100px;">
-            <f:number default="1"/>
+        <div style="width: 300px;">
+            <f:textbox default="1"/>
         </div>
     </f:entry>
 </j:jelly>

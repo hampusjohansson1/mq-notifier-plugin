@@ -19,6 +19,7 @@ import hudson.model.BuildListener;
 import hudson.model.StringParameterValue;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import hudson.EnvVars;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
@@ -112,7 +113,9 @@ public final class CheckOutBuilder extends Builder {
 
                 listener.getLogger().println("Checking out " + resourceGroup.toString());
                 String buildTag = build.getEnvironment(listener).get("BUILD_TAG", UNKNOWN_USER_REFERENCE);
-                if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime())) {
+
+                EnvVars envVars = build.getEnvironment(listener);
+                if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime(), envVars)) {
                     int rollingId = 1;
                     // A successful check-out. Add DUT information to environment variables.
                     ArrayList parameters = new ArrayList<StringParameterValue>();

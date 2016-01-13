@@ -1,7 +1,9 @@
 package com.axis.system.jenkins.plugins.axispoolmanager.resources;
 
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.EnvVars;
 import net.sf.json.JSONObject;
 import org.apache.http.NameValuePair;
 
@@ -16,7 +18,7 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
     private JSONObject managerMetaData = null;
     private boolean checkedOut = false;
 
-    public abstract List<NameValuePair> getURICheckOutParameters();
+    public abstract List<NameValuePair> getURICheckOutParameters(EnvVars envVars) throws CheckOutException;
 
     public abstract List<NameValuePair> getURICheckInParameters();
 

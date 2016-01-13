@@ -11,6 +11,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponse
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.Plugin;
 import hudson.model.AbstractBuild;
+import hudson.EnvVars;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -69,18 +70,19 @@ public final class AxisResourceManager extends Plugin {
      *
      * @param resourceGroup Resource Group
      * @param userReference The user owning the resource
+     * @param envVars hudson.EnvVars
      * @return true if successful
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public boolean checkOut(ResourceGroup resourceGroup, String userReference, int leaseTime)
+    public boolean checkOut(ResourceGroup resourceGroup, String userReference, int leaseTime, EnvVars envVars)
             throws URISyntaxException, IOException, InterruptedException {
         // TODO: We should probably bookkeep the RESTApi end points in a separate file.
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkout_product");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-            uriBuilder.setParameters(resourceEntity.getURICheckOutParameters());
+            uriBuilder.setParameters(resourceEntity.getURICheckOutParameters(envVars));
             uriBuilder.addParameter("max_termination_time", Integer.toString(leaseTime));
             try {
                 uriBuilder.addParameters(getBasicURICheckoutParameters(resourceGroup.getBuild(), userReference));

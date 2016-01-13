@@ -1,7 +1,9 @@
 package com.axis.system.jenkins.plugins.axispoolmanager.resources;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
+import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
 import hudson.Extension;
+import hudson.EnvVars;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,11 +21,10 @@ public final class ProductsFromPoolResource extends ResourceEntity {
     private final String poolName;
     private final String productName;
 
-    // TODO: May need some changes in the management interface
-    private final int numberOfProducts;
+    private final String numberOfProducts;
 
     @DataBoundConstructor
-    public ProductsFromPoolResource(String poolName, String productName, int numberOfProducts) {
+    public ProductsFromPoolResource(String poolName, String productName, String numberOfProducts) {
         this.poolName = poolName;
         this.productName = productName;
         this.numberOfProducts = numberOfProducts;
@@ -37,7 +38,7 @@ public final class ProductsFromPoolResource extends ResourceEntity {
         return productName;
     }
 
-    public int getNumberOfProducts() {
+    public String getNumberOfProducts() {
         return numberOfProducts;
     }
 
@@ -48,16 +49,22 @@ public final class ProductsFromPoolResource extends ResourceEntity {
 
     @Override
     public String toString() {
-        return String.format(this.getClass().getSimpleName() + ": [Pool name: %s, Product name: %s, Number of products: %d]",
+        return String.format(this.getClass().getSimpleName() + ": [Pool name: %s, Product name: %s, Number of products: %s]",
                 getPoolName(), getProductName(), getNumberOfProducts());
     }
 
     @Override
-    public List<NameValuePair> getURICheckOutParameters() {
+    public List<NameValuePair> getURICheckOutParameters(EnvVars envVars) throws CheckOutException {
         ArrayList param = new ArrayList<NameValuePair>();
         param.add(new BasicNameValuePair("product", getProductName()));
         param.add(new BasicNameValuePair("pool", getPoolName()));
-        param.add(new BasicNameValuePair("number", Integer.toString(getNumberOfProducts())));
+        String number = envVars.expand(getNumberOfProducts());
+        try {
+            Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            throw new CheckOutException("Number products to checkout is not a number.");
+        }
+        param.add(new BasicNameValuePair("number", number));
         return param;
     }
 

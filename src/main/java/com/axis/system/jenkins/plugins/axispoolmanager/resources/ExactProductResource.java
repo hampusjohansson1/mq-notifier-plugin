@@ -2,6 +2,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.resources;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
 import hudson.Extension;
+import hudson.EnvVars;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -35,7 +36,7 @@ public final class ExactProductResource extends ResourceEntity {
     }
 
     @Override
-    public List<NameValuePair> getURICheckOutParameters() {
+    public List<NameValuePair> getURICheckOutParameters(EnvVars envVars) {
         ArrayList param = new ArrayList<NameValuePair>();
         param.add(new BasicNameValuePair("mac", getMacAddress()));
         return param;
