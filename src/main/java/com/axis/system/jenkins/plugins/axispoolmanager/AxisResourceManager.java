@@ -9,9 +9,9 @@ import com.axis.system.jenkins.plugins.axispoolmanager.rest.RequestFields;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckInAllResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
+import hudson.EnvVars;
 import hudson.Plugin;
 import hudson.model.AbstractBuild;
-import hudson.EnvVars;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -132,6 +132,8 @@ public final class AxisResourceManager extends Plugin {
             LOGGER.warn("Could not check in all products", e);
         } catch (UnknownHostException e) {
             LOGGER.warn("Could not fetch host name when checking in all products", e);
+        } catch (TransientErrorException e) {
+            LOGGER.warn("Transient error when checking in all products", e);
         }
     }
 
@@ -176,47 +178,50 @@ public final class AxisResourceManager extends Plugin {
             HttpGet req = new HttpGet(uriBuilder.build());
             req.setConfig(getRequestConfig());
             req.addHeader("accept", "application/json");
+            RestResponse response;
             try {
-                RestResponse response = httpClient.execute(req, new RestCheckOutResponseHandler());
-                switch (response.getResultType()) {
-                    case SUCCESS:
-                        LOGGER.info("Successfully checked in resource: " + resourceEntity.toString());
-                        resourceEntity.setCheckedOut(false);
-                        break;
-                    case FATAL:
-                        throw new CheckInException("Could not check in: " + response.getMessage());
-                    default:
-                        throw new CheckInException("Unexpected state: " + response.getMessage());
-                }
+                response = httpClient.execute(req, new RestCheckOutResponseHandler());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new TransientErrorException("Could not contact pool manager", e);
+            }
+            switch (response.getResultType()) {
+                case SUCCESS:
+                    LOGGER.info("Successfully checked in resource: " + resourceEntity.toString());
+                    resourceEntity.setCheckedOut(false);
+                    break;
+                case FATAL:
+                    throw new CheckInException("Could not check in: " + response.getMessage());
+                default:
+                    throw new CheckInException("Unexpected state: " + response.getMessage());
             }
         }
         checkedOutResources.remove(resourceGroup);
     }
 
-    public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException, TransientErrorException {
+    public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException,
+        TransientErrorException {
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkin_all_products");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         uriBuilder.setParameters(getCheckInAllURIParameters());
         HttpGet req = new HttpGet(uriBuilder.build());
         req.setConfig(getRequestConfig());
         req.addHeader("accept", "application/json");
+        RestResponse response;
         try {
-            RestResponse response = httpClient.execute(req, new RestCheckInAllResponseHandler());
-            switch (response.getResultType()) {
-                case SUCCESS:
-                    LOGGER.info("Successfully checked in all resources");
-                    break;
-                case FATAL:
-                    throw new CheckInException("Could not check in all resources: " + response.getMessage());
-                default:
-                    throw new CheckInException("Unexpected state: " + response.getMessage());
-            }
+            response = httpClient.execute(req, new RestCheckInAllResponseHandler());
         } catch (IOException e) {
             e.printStackTrace();
             throw new TransientErrorException("Could not contact pool manager", e);
+        }
+        switch (response.getResultType()) {
+            case SUCCESS:
+                LOGGER.info("Successfully checked in all resources");
+                break;
+            case FATAL:
+                throw new CheckInException("Could not check in all resources: " + response.getMessage());
+            default:
+                throw new CheckInException("Unexpected state: " + response.getMessage());
         }
         checkedOutResources.clear();
     }

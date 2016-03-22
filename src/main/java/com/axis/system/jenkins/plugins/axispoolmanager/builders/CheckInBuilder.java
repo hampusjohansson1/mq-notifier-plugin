@@ -89,7 +89,7 @@ public final class CheckInBuilder extends Builder {
                         + e.getMessage());
                 return false;
             } catch (CheckInException e) {
-                listener.error("Could not check in resources to pool.");
+                listener.error(e.getMessage());
                 return false;
             } catch (TransientErrorException e) {
                 listener.getLogger().println(e.getMessage());
