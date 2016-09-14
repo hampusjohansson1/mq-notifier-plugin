@@ -32,7 +32,7 @@ public final class ExactProductResource extends ResourceEntity {
 
     @Override
     public ResourceEntity getCopy() {
-        return new ExactProductResource(ipAddress);
+        return new ExactProductResource(macAddress);
     }
 
     @Override
