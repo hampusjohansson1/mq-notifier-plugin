@@ -6,7 +6,7 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <!-- Baseline Jenkins version you use to build and test the plugin. Users must have this version or newer to run. -->
-        <version>1.620</version>
+        <version>1.642.3</version>
         <relativePath/>
     </parent>
     <groupId>com.axis.system.jenkins.plugins</groupId>
@@ -93,6 +93,17 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>findbugs</artifactId>
             <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <version>2.3</version>
+            <artifactId>workflow-step-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
         </dependency>
     </dependencies>
     <repositories>

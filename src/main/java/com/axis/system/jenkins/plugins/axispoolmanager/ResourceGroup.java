@@ -1,7 +1,7 @@
 package com.axis.system.jenkins.plugins.axispoolmanager;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,14 +17,14 @@ import java.util.List;
  * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
  */
 public final class ResourceGroup {
-    private final AbstractBuild abstractBuild;
+    private final Run run;
     private final int id;
     private final List<ResourceEntity> resourceEntities;
 
-    public ResourceGroup(AbstractBuild abstractBuild,
+    public ResourceGroup(Run run,
                          int id,
                          List<ResourceEntity> resourceEntities) {
-        this.abstractBuild = abstractBuild;
+        this.run = run;
         this.id = id;
         this.resourceEntities = resourceEntities == null ? Collections.<ResourceEntity>emptyList() : resourceEntities;
     }
@@ -32,8 +32,8 @@ public final class ResourceGroup {
     /**
      * @return The build owning the resources
      */
-    public AbstractBuild getBuild() {
-        return abstractBuild;
+    public Run getBuild() {
+        return run;
     }
 
     /**

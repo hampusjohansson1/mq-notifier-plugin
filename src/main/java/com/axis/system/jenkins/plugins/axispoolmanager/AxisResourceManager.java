@@ -11,7 +11,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponse
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.EnvVars;
 import hudson.Plugin;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -143,17 +143,17 @@ public final class AxisResourceManager extends Plugin {
         super.stop();
     }
 
-    public List<NameValuePair> getBasicURICheckoutParameters(AbstractBuild build, String userReference)
+    public List<NameValuePair> getBasicURICheckoutParameters(Run build, String userReference)
             throws IOException, InterruptedException {
         ArrayList param = new ArrayList<NameValuePair>();
         param.add(new BasicNameValuePair(RequestFields.SERVER_HOST, java.net.InetAddress.getLocalHost().getHostName()));
         param.add(new BasicNameValuePair(RequestFields.USER_REFERENCE, userReference));
-        param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_NAME, build.getProject().getFullName()));
+        param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_NAME, build.getParent().getFullName()));
         param.add(new BasicNameValuePair(RequestFields.CONFIGURATION_BUILD_NBR_NUMBER, build.getId()));
         return param;
     }
 
-    public void checkInAll(AbstractBuild build) throws URISyntaxException, CheckInException, TransientErrorException {
+    public void checkInAll(Run build) throws URISyntaxException, CheckInException, TransientErrorException {
         for (ResourceGroup resourceGroup : checkedOutResources) {
             if (resourceGroup.getBuild().equals(build)) {
                 checkInGroup(resourceGroup);
@@ -226,7 +226,7 @@ public final class AxisResourceManager extends Plugin {
         checkedOutResources.clear();
     }
 
-    public ResourceGroup checkInGroup(AbstractBuild build, int resourceGroupId) throws CheckInException,
+    public ResourceGroup checkInGroup(Run build, int resourceGroupId) throws CheckInException,
             TransientErrorException, URISyntaxException {
         for (ResourceGroup resourceGroup : checkedOutResources) {
             if (resourceGroup.getBuild().equals(build) && resourceGroup.getId() == resourceGroupId) {

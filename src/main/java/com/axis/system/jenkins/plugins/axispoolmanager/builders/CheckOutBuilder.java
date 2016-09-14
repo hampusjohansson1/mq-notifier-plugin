@@ -10,16 +10,18 @@ import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientError
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
+import hudson.model.Run;
 import hudson.model.StringParameterValue;
+import hudson.model.TaskListener;
+import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import hudson.EnvVars;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
@@ -30,7 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -95,12 +101,18 @@ public final class CheckOutBuilder extends Builder {
         return leaseTime;
     }
 
-    @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+    /**
+     * Does the actual checking out of resources. This method is callable from
+     * {@link com.axis.system.jenkins.plugins.axispoolmanager.pipeline.CheckOutStep}
+     * @param build The build that wants to check out the resource.
+     * @param listener The task listener used to log progress and errors.
+     * @return A string describing the checked out resource if the check out was successful, null if not.
+     */
+    public String checkOutResource(Run build, TaskListener listener) {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
         if (axisResourceManager == null) {
             listener.fatalError("Could not fetch " + AxisResourceManager.class.getName() + " instance.");
-            return false;
+            return null;
         }
 
         ResourceGroup resourceGroup = new ResourceGroup(build, getResourceGroupId(), getCopyOfResourceEntities());
@@ -137,34 +149,37 @@ public final class CheckOutBuilder extends Builder {
                     build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
                             parameters, build, resourceGroupId));
                     // JSONified action struct. We only need one which will be rebuilt when the environment is built.
+                    String jsonenv = null;
                     if (build.getActions(ResourceJsonEnvironmentAction.class).isEmpty()) {
-                        build.addAction(new ResourceJsonEnvironmentAction(build));
+                        ResourceJsonEnvironmentAction action = new ResourceJsonEnvironmentAction(build);
+                        build.addAction(action);
+                        jsonenv = action.getEnvVal();
                     }
                     listener.getLogger().println("Successfully checked out the complete resource group: "
                             + resourceGroup.toString());
-                    return true;
+                    return jsonenv;
                 }
 
             } catch (URISyntaxException e) {
                 listener.fatalError("Could not construct URI. Please check global configuration for Pool Manager RESTApi URI: "
                         + e.getMessage());
-                return false;
+                return null;
             } catch (InterruptedException e) {
                 listener.fatalError(e.getMessage());
-                return false;
+                return null;
             } catch (TransientErrorException e) {
                 // Log the reason for the unsuccessful checkout and try again.
                 listener.getLogger().println(e.getMessage());
             } catch (CheckOutException e) {
                 // Log the reason for the unsuccessful checkout and quit
                 listener.error(e.getMessage());
-                return false;
+                return null;
             } catch (CheckInException e) {
                 listener.fatalError(e.getMessage());
-                return false;
+                return null;
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
+                return null;
             }
             int retryTimer = axisResourceManager.getConfig().RETRY_MILLIS;
             listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
@@ -173,11 +188,16 @@ public final class CheckOutBuilder extends Builder {
                 Thread.sleep(retryTimer);
             } catch (InterruptedException e) {
                 listener.fatalError(e.getMessage());
-                return false;
+                return null;
             }
         }
         listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
-        return false;
+        return null;
+    }
+
+    @Override
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+        return checkOutResource(build, listener) != null;
     }
 
     /**

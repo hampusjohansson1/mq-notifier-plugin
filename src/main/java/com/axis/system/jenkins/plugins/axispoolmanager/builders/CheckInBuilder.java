@@ -10,6 +10,8 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import net.sf.json.JSONObject;
@@ -59,10 +61,15 @@ public final class CheckInBuilder extends Builder {
         this.resourceGroupId = resourceGroupId != null ? resourceGroupId : 1;
     }
 
-    @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+    /**
+     * Does the actual checking in of resources. Moved to a separate method in order to be
+     * callable from a {@link com.axis.system.jenkins.plugins.axispoolmanager.pipeline.CheckInStep}
+     * @param build The build that wants to check in the resource.
+     * @param listener The task listener used to log progress and errors.
+     * @return true if the check in was successful, false if not.
+     */
+    public boolean checkInResource(Run build, TaskListener listener) {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
-
         int retries = axisResourceManager.getConfig().getMaxCheckoutRetries();
         while (retries-- > 0) {
             try {
@@ -107,6 +114,11 @@ public final class CheckInBuilder extends Builder {
         }
         listener.fatalError("Out of retries. Failed to check in resources. Failing build.");
         return false;
+    }
+
+    @Override
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+        return checkInResource(build, listener);
     }
 
     /**
