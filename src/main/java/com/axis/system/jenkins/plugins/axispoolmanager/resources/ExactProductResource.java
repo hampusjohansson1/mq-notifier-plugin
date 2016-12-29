@@ -38,7 +38,7 @@ public final class ExactProductResource extends ResourceEntity {
     @Override
     public List<NameValuePair> getURICheckOutParameters(EnvVars envVars) {
         ArrayList param = new ArrayList<NameValuePair>();
-        param.add(new BasicNameValuePair("mac", getMacAddress()));
+        param.add(new BasicNameValuePair("mac", envVars.expand(getMacAddress())));
         return param;
     }
 

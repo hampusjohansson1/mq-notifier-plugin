@@ -56,8 +56,8 @@ public final class ProductsFromPoolResource extends ResourceEntity {
     @Override
     public List<NameValuePair> getURICheckOutParameters(EnvVars envVars) throws CheckOutException {
         ArrayList param = new ArrayList<NameValuePair>();
-        param.add(new BasicNameValuePair("product", getProductName()));
-        param.add(new BasicNameValuePair("pool", getPoolName()));
+        param.add(new BasicNameValuePair("product", envVars.expand(getProductName())));
+        param.add(new BasicNameValuePair("pool", envVars.expand(getPoolName())));
         String number = envVars.expand(getNumberOfProducts());
         try {
             Integer.parseInt(number);
