@@ -4,7 +4,6 @@ import com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameter
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
 import hudson.Extension;
-import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -24,10 +23,8 @@ public final class AxisResourcesGarbageCollector extends RunListener<Run> {
         super.onCompleted(run, listener);
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
         try {
-            if (run instanceof AbstractBuild) {
-                axisResourceManager.checkInAll((AbstractBuild) run);
-                AxisPoolParameterAction.disableEnvVars(run);
-            }
+            axisResourceManager.checkInAll(run);
+            AxisPoolParameterAction.disableEnvVars(run);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (CheckInException e) {
