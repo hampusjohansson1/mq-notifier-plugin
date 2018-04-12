@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.axis.system.jenkins.plugins</groupId>
     <artifactId>axis-pool-manager</artifactId>
-    <version>1.0.1</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Axis Pool Manager Plugin</name>
     <description>Allows builds to checkout and checkin cameras from Labnet</description>
