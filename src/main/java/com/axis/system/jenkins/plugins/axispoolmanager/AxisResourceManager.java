@@ -7,6 +7,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientError
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RequestFields;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckInAllResponseHandler;
+import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckInResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestCheckOutResponseHandler;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.RestResponse;
 import hudson.EnvVars;
@@ -180,7 +181,7 @@ public final class AxisResourceManager extends Plugin {
             req.addHeader("accept", "application/json");
             RestResponse response;
             try {
-                response = httpClient.execute(req, new RestCheckOutResponseHandler());
+                response = httpClient.execute(req, new RestCheckInResponseHandler());
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new TransientErrorException("Could not contact pool manager", e);
