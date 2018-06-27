@@ -2,3 +2,9 @@ target
 work
 .idea
 *.iml
+.classpath
+.project
+.settings/
+.vscode/
+pom.xml.releaseBackup
+release.properties
