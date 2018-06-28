@@ -7,6 +7,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.actions.ResourceJsonEnvir
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckInException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.TransientErrorException;
+import com.axis.system.jenkins.plugins.axispoolmanager.mq.MqHelper;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -117,6 +118,7 @@ public final class CheckOutBuilder extends Builder {
 
         ResourceGroup resourceGroup = new ResourceGroup(build, getResourceGroupId(), getCopyOfResourceEntities());
         int retries = axisResourceManager.getConfig().getMaxCheckoutRetries();
+        long startTime = System.currentTimeMillis();
         while (retries-- > 0) {
             try {
                 // Some entities may have been checked out. Let's try to check them in.
@@ -143,6 +145,9 @@ public final class CheckOutBuilder extends Builder {
                             }
                             rollingId++;
                         }
+                    }
+                    if (MqHelper.isMqNotifierInstalled()) {
+                        MqHelper.publishSuccessfulCheckOut(resourceGroup, System.currentTimeMillis() - startTime);
                     }
                     // We expose the data as environment variables through the use of a ParameterAction. This
                     // also means the user gets easy access to the DUTs meta data for every build.

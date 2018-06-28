@@ -73,6 +73,12 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>com.sonymobile.jenkins.plugins.mq</groupId>
+            <artifactId>mq-notifier</artifactId>
+            <version>1.2.6</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
             <version>1.36</version>
@@ -87,6 +93,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -130,13 +141,4 @@
             <url>http://containers.se.axis.com:8080/artifactory/plugins-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
