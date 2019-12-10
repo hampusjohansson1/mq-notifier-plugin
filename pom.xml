@@ -12,6 +12,8 @@
         <jenkins.version>2.62</jenkins.version>
         <java.level>8</java.level>
         <jenkins-test-harness.version>2.38</jenkins-test-harness.version>
+        <!-- Need this due to commit message rules (default prefix start with non-alphanumeric char): -->
+        <scmCommentPrefix>maven-release-plugin: </scmCommentPrefix>
     </properties>
     <groupId>com.axis.system.jenkins.plugins</groupId>
     <artifactId>axis-pool-manager</artifactId>
