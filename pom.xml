@@ -129,16 +129,22 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <scm>
+        <connection>scm:git:ssh://gittools.se.axis.com:29418/system/jenkins/plugins/axis-pool-manager
+        </connection>
+        <developerConnection>scm:git:ssh://gittools.se.axis.com:29418/system/jenkins/plugins/axis-pool-manager
+        </developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <distributionManagement>
         <repository>
-            <id>containers.se.axis.com</id>
-            <name>containers.se.axis.com-releases</name>
-            <url>http://containers.se.axis.com:8080/artifactory/plugins-release-local</url>
+            <id>tools-maven2</id>
+            <url>https://artifacts.se.axis.com/artifactory/tools-maven2</url>
         </repository>
         <snapshotRepository>
-            <id>containers.se.axis.com</id>
-            <name>containers.se.axis.com-snapshots</name>
-            <url>http://containers.se.axis.com:8080/artifactory/plugins-snapshot-local</url>
+            <id>tools-maven2</id>
+            <url>https://artifacts.se.axis.com/artifactory/tools-maven2</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
