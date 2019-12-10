@@ -52,7 +52,7 @@ public class MqHelper {
                                 getDutName(
                                         host.getString("project"),
                                         host.getString("product"),
-                                        host.getInt("id")))
+                                        host.getString("identifier")))
                         .element("jenkins_master_fqdn", Util.getHostName())
                         .element("location", host.getString("shelf"))
                         .element("pool_name", host.getString("pool"))
@@ -75,7 +75,7 @@ public class MqHelper {
      * @param identifier identifier
      * @return the formatted dut name
      */
-    public static String getDutName(String project, String product, int identifier) {
-        return String.format("%s-%s-%d", project, product, identifier);
+    public static String getDutName(String project, String product, String identifier) {
+        return String.format("%s-%s-%s", project, product, identifier);
     }
 }
