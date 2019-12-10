@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>2.37</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <properties>
         <jenkins.version>2.62</jenkins.version>
@@ -17,7 +16,7 @@
     </properties>
     <groupId>com.axis.system.jenkins.plugins</groupId>
     <artifactId>axis-pool-manager</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>hpi</packaging>
     <name>Axis Pool Manager Plugin</name>
     <description>Allows builds to checkout and checkin cameras from Labnet</description>
@@ -136,7 +135,7 @@
         </connection>
         <developerConnection>scm:git:ssh://gittools.se.axis.com:29418/system/jenkins/plugins/axis-pool-manager
         </developerConnection>
-        <tag>HEAD</tag>
+        <tag>axis-pool-manager-1.1</tag>
     </scm>
 
     <distributionManagement>
