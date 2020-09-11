@@ -17,10 +17,11 @@ import hudson.ExtensionList;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.ParameterValue;
 import hudson.model.Run;
 import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
-import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import jenkins.model.Jenkins;
@@ -130,39 +131,21 @@ public final class CheckOutBuilder extends Builder {
 
                 EnvVars envVars = build.getEnvironment(listener);
                 if (axisResourceManager.checkOut(resourceGroup, buildTag, getLeaseTime(), envVars)) {
-                    int rollingId = 1;
-                    // A successful check-out. Add DUT information to environment variables.
-                    ArrayList parameters = new ArrayList<StringParameterValue>();
-                    for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-                        String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.REFERENCE);
-                        JSONArray hosts = resourceEntity.getManagerMetaData().getJSONArray(ResponseFields.HOSTS);
-                        for (Object o : hosts) {
-                            JSONObject host = (JSONObject) o;
-                            for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) host.entrySet()) {
-                                String envKey  = "DUT_" + rollingId + "_" + entry.getKey().toUpperCase();
-                                String envValue = entry.getValue().toString();
-                                parameters.add(new StringParameterValue(envKey, envValue));
-                            }
-                            rollingId++;
-                        }
-                    }
+
                     if (MqHelper.isMqNotifierInstalled()) {
                         MqHelper.publishSuccessfulCheckOut(resourceGroup, System.currentTimeMillis() - startTime);
                     }
+                    List<ParameterValue> resourceParameters = createResourceParameters(resourceGroup);
                     // We expose the data as environment variables through the use of a ParameterAction. This
                     // also means the user gets easy access to the DUTs meta data for every build.
                     build.addAction(new AxisPoolParameterAction("Axis DUT Data [" + resourceGroupId + "]",
-                            parameters, build, resourceGroupId));
+                            resourceParameters, build, resourceGroupId));
                     // JSONified action struct. We only need one which will be rebuilt when the environment is built.
-                    String jsonenv = null;
-                    if (build.getActions(ResourceJsonEnvironmentAction.class).isEmpty()) {
-                        ResourceJsonEnvironmentAction action = new ResourceJsonEnvironmentAction(build);
-                        build.addAction(action);
-                        jsonenv = action.getEnvVal();
-                    }
+                    ResourceJsonEnvironmentAction resourceAction = new ResourceJsonEnvironmentAction(build);
+                    build.addOrReplaceAction(resourceAction);
                     listener.getLogger().println("Successfully checked out the complete resource group: "
                             + resourceGroup.toString());
-                    return jsonenv;
+                    return resourceAction.getEnvVal();
                 }
 
             } catch (URISyntaxException e) {
@@ -198,6 +181,26 @@ public final class CheckOutBuilder extends Builder {
         }
         listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
         return null;
+    }
+
+    private List<ParameterValue> createResourceParameters(ResourceGroup resourceGroup){
+        int rollingId = 1;
+        // A successful check-out. Add DUT information to environment variables.
+        ArrayList parameters = new ArrayList<StringParameterValue>();
+        for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
+            String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.REFERENCE);
+            JSONArray hosts = resourceEntity.getManagerMetaData().getJSONArray(ResponseFields.HOSTS);
+            for (Object o : hosts) {
+                JSONObject host = (JSONObject) o;
+                for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) host.entrySet()) {
+                    String envKey  = "DUT_" + rollingId + "_" + entry.getKey().toUpperCase();
+                    String envValue = entry.getValue().toString();
+                    parameters.add(new StringParameterValue(envKey, envValue));
+                }
+                rollingId++;
+            }
+        }
+        return parameters;
     }
 
     @Override
