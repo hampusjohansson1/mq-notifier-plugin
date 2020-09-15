@@ -4,31 +4,33 @@ import com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ExactProductResource;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ProductsFromPoolResource;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import com.google.inject.Inject;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
-import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
-import org.jenkinsci.plugins.workflow.steps.AbstractSynchronousNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.Step;
-import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Pipeline step implementation of the {@link CheckOutBuilder}.
  *
  * @author Tomas Westling <tomas.westling@axis.com> (C) Axis 2016
  */
-public class CheckOutStep extends AbstractStepImpl {
+public class CheckOutStep extends Step {
     private final int resourceGroupId;
     //TODO the pipeline implementation only takes a single resourceEntity per step.
     //If we see the need to support multiple, like the CheckOutBuilder, this needs to be implemented.
@@ -72,17 +74,20 @@ public class CheckOutStep extends AbstractStepImpl {
         return leaseTime;
     }
 
+    @Override
+    public StepExecution start(StepContext context) throws Exception {
+        return new CheckOutStepExecution(context, this);
+    }
+
     /**
      * Step descriptor for the CheckOutStep, used to instantiate CheckOutSteps from configuration.
      */
     @Extension
-    public static class DescriptorImpl extends AbstractStepDescriptorImpl {
+    public static class DescriptorImpl extends StepDescriptor {
 
-        /**
-         * Standard constructor.
-         */
-        public DescriptorImpl() {
-            super(CheckOutStepExecution.class);
+        @Override
+        public Set<? extends Class<?>> getRequiredContext() {
+            return ImmutableSet.of(TaskListener.class, Run.class);
         }
 
         @Override
@@ -115,25 +120,20 @@ public class CheckOutStep extends AbstractStepImpl {
      * Step Execution for the CheckOutStep. Passes on the parameters to a CheckOutBuilder
      * that does the actual work.
      */
-    public static class CheckOutStepExecution extends AbstractSynchronousNonBlockingStepExecution<String> {
+    public static class CheckOutStepExecution extends SynchronousNonBlockingStepExecution<String> {
 
-        @StepContextParameter
-        private transient TaskListener listener;
 
-        @StepContextParameter
-        private transient FilePath ws;
-
-        @StepContextParameter
-        private transient Run build;
-
-        @StepContextParameter
-        private transient Launcher launcher;
-
-        @Inject
         private transient CheckOutStep step;
 
+        @Inject
+        protected CheckOutStepExecution(@Nonnull StepContext context, CheckOutStep step) {
+            super(context);
+            this.step = step;
+        }
+
         @Override
-        protected final String run() throws Exception {
+        protected final String run() throws IOException, InterruptedException {
+            StepContext context = this.getContext();
             List<ResourceEntity> resourceEntitylist = new LinkedList<ResourceEntity>();
             if (step.resource.size() == 1) {
                     resourceEntitylist.add(new ExactProductResource(step.resource.get(0)));
@@ -145,7 +145,7 @@ public class CheckOutStep extends AbstractStepImpl {
                             + " 1 or 3, but was " + step.resource.size());
             }
             CheckOutBuilder builder = new CheckOutBuilder(step.resourceGroupId, resourceEntitylist, step.leaseTime);
-            return builder.checkOutResource(build, listener);
+            return builder.checkOutResource(context.get(Run.class), context.get(TaskListener.class));
         }
     }
 }

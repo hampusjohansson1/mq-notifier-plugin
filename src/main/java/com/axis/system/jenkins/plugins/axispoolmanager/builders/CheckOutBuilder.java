@@ -11,6 +11,7 @@ import com.axis.system.jenkins.plugins.axispoolmanager.mq.MqHelper;
 import com.axis.system.jenkins.plugins.axispoolmanager.resources.ResourceEntity;
 import com.axis.system.jenkins.plugins.axispoolmanager.rest.ResponseFields;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -27,6 +28,7 @@ import hudson.tasks.Builder;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.slf4j.Logger;
@@ -110,7 +112,7 @@ public final class CheckOutBuilder extends Builder {
      * @param listener The task listener used to log progress and errors.
      * @return A string describing the checked out resource if the check out was successful, null if not.
      */
-    public String checkOutResource(Run build, TaskListener listener) {
+    public String checkOutResource(Run build, TaskListener listener) throws AbortException {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
         if (axisResourceManager == null) {
             listener.fatalError("Could not fetch " + AxisResourceManager.class.getName() + " instance.");
@@ -149,25 +151,16 @@ public final class CheckOutBuilder extends Builder {
                 }
 
             } catch (URISyntaxException e) {
-                listener.fatalError("Could not construct URI. Please check global configuration for Pool Manager RESTApi URI: "
+                throw new AbortException("Could not construct URI. Please check global configuration for Pool Manager RESTApi URI: "
                         + e.getMessage());
-                return null;
-            } catch (InterruptedException e) {
-                listener.fatalError(e.getMessage());
-                return null;
+            } catch (InterruptedException | CheckOutException | CheckInException e) {
+                throw new AbortException(e.getMessage());
             } catch (TransientErrorException e) {
                 // Log the reason for the unsuccessful checkout and try again.
                 listener.getLogger().println(e.getMessage());
-            } catch (CheckOutException e) {
-                // Log the reason for the unsuccessful checkout and quit
-                listener.error(e.getMessage());
-                return null;
-            } catch (CheckInException e) {
-                listener.fatalError(e.getMessage());
-                return null;
             } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+                listener.fatalError(ExceptionUtils.getStackTrace(e));
+                throw new AbortException(e.getMessage());
             }
             int retryTimer = axisResourceManager.getConfig().RETRY_MILLIS;
             listener.getLogger().println("Retrying in " + TimeUnit.MILLISECONDS.toSeconds(retryTimer)
@@ -175,12 +168,10 @@ public final class CheckOutBuilder extends Builder {
             try {
                 Thread.sleep(retryTimer);
             } catch (InterruptedException e) {
-                listener.fatalError(e.getMessage());
-                return null;
+                throw new AbortException(e.getMessage());
             }
         }
-        listener.fatalError("Out of retries. Failed to check out all resources. Failing build.");
-        return null;
+        throw new AbortException("Out of retries. Failed to check out all resources. Failing build.");
     }
 
     private List<ParameterValue> createResourceParameters(ResourceGroup resourceGroup){
@@ -204,7 +195,7 @@ public final class CheckOutBuilder extends Builder {
     }
 
     @Override
-    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
+    public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws AbortException {
         return checkOutResource(build, listener) != null;
     }
 
