@@ -8,6 +8,7 @@ import net.sf.json.JSONObject;
 import org.apache.http.NameValuePair;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Extend from this class to introduce new resource types.
@@ -15,8 +16,9 @@ import java.util.List;
  * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
  */
 public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEntity> {
-    private JSONObject managerMetaData = null;
+    private JSONObject managerMetaData = new JSONObject();
     private boolean checkedOut = false;
+    private final UUID correlationID = UUID.randomUUID();
 
     public abstract List<NameValuePair> getURICheckOutParameters(EnvVars envVars) throws CheckOutException;
 
@@ -33,13 +35,17 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
      */
     public abstract ResourceEntity getCopy();
 
+    public JSONObject getMetaData(){
+        JSONObject metaData = getManagerMetaData();
+        metaData.put("correlation_id", getCorrelationID());
+        return metaData;
+    }
+
     public final void setManagerMetaData(JSONObject managerMetaData) {
         this.managerMetaData = managerMetaData;
     }
 
-    public final JSONObject getManagerMetaData() {
-        return managerMetaData;
-    }
+    public final JSONObject getManagerMetaData() { return managerMetaData; }
 
     public final boolean isCheckedOut() {
         return checkedOut;
@@ -47,6 +53,10 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
 
     public final void setCheckedOut(boolean checkedOut) {
         this.checkedOut = checkedOut;
+    }
+
+    public final String getCorrelationID(){
+        return correlationID.toString();
     }
 
     /**

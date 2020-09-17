@@ -49,8 +49,8 @@ public final class ProductsFromPoolResource extends ResourceEntity {
 
     @Override
     public String toString() {
-        return String.format(this.getClass().getSimpleName() + ": [Pool name: %s, Product name: %s, Number of products: %s]",
-                getPoolName(), getProductName(), getNumberOfProducts());
+        return String.format(this.getClass().getSimpleName() + ": [Pool name: %s, Product name: %s, Number of products: %s, Correlation ID: %s]",
+                getPoolName(), getProductName(), getNumberOfProducts(), getCorrelationID());
     }
 
     @Override

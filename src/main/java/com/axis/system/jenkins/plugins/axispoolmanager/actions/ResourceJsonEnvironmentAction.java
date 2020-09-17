@@ -39,9 +39,8 @@ public final class ResourceJsonEnvironmentAction implements EnvironmentContribut
         JSONArray jsonArray = new JSONArray();
         for (ResourceGroup resourceGroup : manager.getCheckedOutResources()) {
             if (resourceGroup.getBuild().equals(run)) {
-                JSONObject jsonObject = new JSONObject();
                 for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-                    jsonArray.add(resourceEntity.getManagerMetaData());
+                    jsonArray.add(resourceEntity.getMetaData());
                 }
             }
         }

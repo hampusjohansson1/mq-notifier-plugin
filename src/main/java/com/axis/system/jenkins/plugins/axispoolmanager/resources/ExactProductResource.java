@@ -51,7 +51,8 @@ public final class ExactProductResource extends ResourceEntity {
 
     @Override
     public String toString() {
-        return String.format(this.getClass().getSimpleName() + ": [MAC Address: %s]", getMacAddress());
+        return String.format(this.getClass().getSimpleName() + ": [MAC Address: %s, Correlation ID: %s]",
+                getMacAddress(), getCorrelationID());
     }
 
     /**

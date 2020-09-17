@@ -71,7 +71,7 @@ public final class AxisResourceManager extends Plugin {
      *
      * @param resourceGroup Resource Group
      * @param userReference The user owning the resource
-     * @param envVars hudson.EnvVars
+     * @param envVars       hudson.EnvVars
      * @return true if successful
      * @throws URISyntaxException
      * @throws IOException
@@ -92,6 +92,7 @@ public final class AxisResourceManager extends Plugin {
             }
             HttpGet req = new HttpGet(uriBuilder.build());
             req.addHeader("accept", "application/json");
+            req.addHeader("X-Correlation-ID", resourceEntity.getCorrelationID());
             req.setConfig(getRequestConfig());
             RestResponse response;
             try {
@@ -179,6 +180,7 @@ public final class AxisResourceManager extends Plugin {
             HttpGet req = new HttpGet(uriBuilder.build());
             req.setConfig(getRequestConfig());
             req.addHeader("accept", "application/json");
+            req.addHeader("X-Correlation-ID", resourceEntity.getCorrelationID());
             RestResponse response;
             try {
                 response = httpClient.execute(req, new RestCheckInResponseHandler());
@@ -201,7 +203,7 @@ public final class AxisResourceManager extends Plugin {
     }
 
     public void checkInAll() throws URISyntaxException, CheckInException, UnknownHostException,
-        TransientErrorException {
+            TransientErrorException {
         URIBuilder uriBuilder = new URIBuilder(getConfig().getRestApiURI() + "checkin_all_products");
         CloseableHttpClient httpClient = HttpClients.createDefault();
         uriBuilder.setParameters(getCheckInAllURIParameters());

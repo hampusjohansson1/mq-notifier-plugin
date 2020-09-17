@@ -179,9 +179,8 @@ public final class CheckOutBuilder extends Builder {
         // A successful check-out. Add DUT information to environment variables.
         ArrayList parameters = new ArrayList<StringParameterValue>();
         for (ResourceEntity resourceEntity : resourceGroup.getResourceEntities()) {
-            String resourceId = resourceEntity.getManagerMetaData().getString(ResponseFields.REFERENCE);
-            JSONArray hosts = resourceEntity.getManagerMetaData().getJSONArray(ResponseFields.HOSTS);
-            for (Object o : hosts) {
+            JSONObject metaData = resourceEntity.getManagerMetaData();
+            for (Object o : metaData.getJSONArray(ResponseFields.HOSTS)) {
                 JSONObject host = (JSONObject) o;
                 for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) host.entrySet()) {
                     String envKey  = "DUT_" + rollingId + "_" + entry.getKey().toUpperCase();
