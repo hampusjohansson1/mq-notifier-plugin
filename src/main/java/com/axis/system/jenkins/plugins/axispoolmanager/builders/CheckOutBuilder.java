@@ -27,7 +27,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -174,7 +173,7 @@ public final class CheckOutBuilder extends Builder {
         throw new AbortException("Out of retries. Failed to check out all resources. Failing build.");
     }
 
-    private List<ParameterValue> createResourceParameters(ResourceGroup resourceGroup){
+    private List<ParameterValue> createResourceParameters(ResourceGroup resourceGroup) {
         int rollingId = 1;
         // A successful check-out. Add DUT information to environment variables.
         ArrayList parameters = new ArrayList<StringParameterValue>();

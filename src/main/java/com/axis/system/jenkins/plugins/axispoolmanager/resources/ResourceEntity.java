@@ -35,7 +35,7 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
      */
     public abstract ResourceEntity getCopy();
 
-    public JSONObject getMetaData(){
+    public final JSONObject getMetaData() {
         JSONObject metaData = getManagerMetaData();
         metaData.put("correlation_id", getCorrelationID());
         return metaData;
@@ -55,7 +55,7 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
         this.checkedOut = checkedOut;
     }
 
-    public final String getCorrelationID(){
+    public final String getCorrelationID() {
         return correlationID.toString();
     }
 

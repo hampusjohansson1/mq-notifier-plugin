@@ -8,7 +8,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.Run;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 /**
  * Builds and adds an Environment Variable suitable for consumption of

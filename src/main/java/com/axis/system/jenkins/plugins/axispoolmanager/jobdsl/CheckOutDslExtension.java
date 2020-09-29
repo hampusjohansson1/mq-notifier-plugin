@@ -41,7 +41,7 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
     /**
      * Building Resource Entities to use by {@link CheckOutBuilder}.
      */
-    final class CheckOutDslContext implements Context {
+    static final class CheckOutDslContext implements Context {
         List resourceEntities = new ArrayList<ResourceEntity>();
         /**
          * DSL Mapping for {@link ExactProductResource}.

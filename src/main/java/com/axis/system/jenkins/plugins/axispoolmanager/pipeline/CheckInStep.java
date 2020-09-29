@@ -80,6 +80,8 @@ public class CheckInStep extends AbstractStepImpl {
      */
     public static class CheckInStepExecution extends AbstractSynchronousNonBlockingStepExecution<Boolean> {
 
+        private static final long serialVersionUID = 4L;
+
         @StepContextParameter
         private transient TaskListener listener;
 

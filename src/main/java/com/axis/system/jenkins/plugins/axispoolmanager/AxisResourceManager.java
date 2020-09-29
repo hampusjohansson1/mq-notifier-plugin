@@ -54,12 +54,7 @@ public final class AxisResourceManager extends Plugin {
      */
     public static AxisResourceManager getInstance() {
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins != null) {
-            return jenkins.getPlugin(AxisResourceManager.class);
-        } else {
-            LOGGER.error("Error, Jenkins could not be found, so no plugin!");
-            return null;
-        }
+        return jenkins.getPlugin(AxisResourceManager.class);
     }
 
     private RequestConfig getRequestConfig() {

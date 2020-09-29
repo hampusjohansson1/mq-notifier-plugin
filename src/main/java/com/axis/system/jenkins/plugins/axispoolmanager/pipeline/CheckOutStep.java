@@ -75,7 +75,7 @@ public class CheckOutStep extends Step {
     }
 
     @Override
-    public StepExecution start(StepContext context) throws Exception {
+    public final StepExecution start(StepContext context) throws Exception {
         return new CheckOutStepExecution(context, this);
     }
 
@@ -86,7 +86,7 @@ public class CheckOutStep extends Step {
     public static class DescriptorImpl extends StepDescriptor {
 
         @Override
-        public Set<? extends Class<?>> getRequiredContext() {
+        public final Set<? extends Class<?>> getRequiredContext() {
             return ImmutableSet.of(TaskListener.class, Run.class);
         }
 
@@ -122,6 +122,7 @@ public class CheckOutStep extends Step {
      */
     public static class CheckOutStepExecution extends SynchronousNonBlockingStepExecution<String> {
 
+        private static final long serialVersionUID = 4L;
 
         private transient CheckOutStep step;
 
