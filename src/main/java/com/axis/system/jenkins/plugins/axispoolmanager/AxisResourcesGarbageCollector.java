@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
  * Listens on all completed or failed builds and ensures no resources are
  * left in a checked out state.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 @Extension
 public final class AxisResourcesGarbageCollector extends RunListener<Run> {

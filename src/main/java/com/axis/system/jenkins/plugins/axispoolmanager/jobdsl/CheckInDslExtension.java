@@ -14,7 +14,7 @@ public final class CheckInDslExtension extends ContextExtensionPoint {
 
     /***
      * Entry point for the CheckIn DSL bindings.
-     * <p/>
+     * <p>
      * Checks in all previously checked out resources.
      *
      * @return {@link CheckInBuilder}
@@ -26,9 +26,10 @@ public final class CheckInDslExtension extends ContextExtensionPoint {
 
     /***
      * Entry point for the CheckIn DSL bindings.
-     * <p/>
+     * <p>
      * Checks in the specified resource group.
      *
+     * @param resourceGroupId The ID of the resource group to check in
      * @return {@link CheckInBuilder}
      */
     @DslExtensionMethod(context = StepContext.class)

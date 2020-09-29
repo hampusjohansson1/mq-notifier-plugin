@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Pipeline step implementation of the {@link CheckOutBuilder}.
  *
- * @author Tomas Westling <tomas.westling@axis.com> (C) Axis 2016
+ * @author Tomas Westling {@literal <tomas.westling@axis.com>} (C) Axis 2016
  */
 public class CheckOutStep extends Step {
     private final int resourceGroupId;

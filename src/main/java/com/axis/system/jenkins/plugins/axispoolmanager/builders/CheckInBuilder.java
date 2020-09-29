@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 /**
  * Build step for checking in a previously dispatched camera.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class CheckInBuilder extends Builder {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckInBuilder.class);
@@ -53,7 +53,7 @@ public final class CheckInBuilder extends Builder {
      *
      * @param value           Type of check in.
      * @param resourceGroupId resource group Id. Integer instead of int, since it may be null
-     *                        depending on CheckInType bounded <f:radioBlock> in .jelly
+     *                        depending on CheckInType bounded {@literal <f:radioBlock>} in .jelly
      */
     @DataBoundConstructor
     public CheckInBuilder(CheckInType value, Integer resourceGroupId) {

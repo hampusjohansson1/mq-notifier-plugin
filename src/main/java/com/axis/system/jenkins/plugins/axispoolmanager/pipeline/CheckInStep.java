@@ -17,7 +17,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 /**
  * Pipeline step implementation of the {@link CheckInBuilder}.
  *
- * @author Tomas Westling <tomas.westling@axis.com> (C) Axis 2016
+ * @author Tomas Westling {@literal <tomas.westling@axis.com>} (C) Axis 2016
  */
 public class CheckInStep extends AbstractStepImpl {
     private final int resourceGroupId;

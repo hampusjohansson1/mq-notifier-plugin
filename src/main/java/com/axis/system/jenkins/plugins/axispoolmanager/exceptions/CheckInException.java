@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Something went wrong when checking in resources.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public class CheckInException extends IOException {
     public CheckInException(String message, Throwable cause) {

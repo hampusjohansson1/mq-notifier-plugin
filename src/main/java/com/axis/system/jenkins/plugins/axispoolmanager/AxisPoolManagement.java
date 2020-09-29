@@ -17,9 +17,9 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- * Global configuration and status page. Only used from {@link AxisPoolManagement/index.jelly}
+ * Global configuration and status page. Only used from AxisPoolManagement/index.jelly
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 @Extension
 public final class AxisPoolManagement extends ManagementLink implements Describable<AxisPoolManagement> {
@@ -63,9 +63,8 @@ public final class AxisPoolManagement extends ManagementLink implements Describa
      *
      * @param req StaplerRequest The request
      * @param rsp StaplerResponse The response with our form data
-     * @throws ServletException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws ServletException If redirection fails
+     * @throws IOException Could not save config to disk
      */
     public void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws ServletException,
             IOException {

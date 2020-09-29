@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Extend from this class to introduce new resource types.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEntity> {
     private JSONObject managerMetaData = new JSONObject();
@@ -31,7 +31,8 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
      * I also want to avoid clone() which is discouraged since we lose control over derived
      * classes (Object already implements clone).
      *
-     * @see CheckOutBuilder.getCopyOfResourceEntities()
+     * @see com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder
+     * @return A copy of the ResourceEntity
      */
     public abstract ResourceEntity getCopy();
 

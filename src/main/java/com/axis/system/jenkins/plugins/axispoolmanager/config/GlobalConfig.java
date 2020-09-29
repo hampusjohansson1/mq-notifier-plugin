@@ -4,9 +4,9 @@ import net.sf.json.JSONObject;
 
 /**
  * Main container of the global configuration settings.
- * Values modified in runtime through {@link "AxisPoolManagement/index.jelly"}
+ * Values modified in runtime through AxisPoolManagement/index.jelly
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class GlobalConfig {
     /**
@@ -41,7 +41,7 @@ public final class GlobalConfig {
     /**
      * Create a new GlobalConfig from form posted JSON data through.
      *
-     * {@link "AxisPoolManagement/index.jelly"}
+     * see AxisPoolManagement/index.jelly
      *
      * @param jsonObject The form data
      * @return Parsed form data as GlobalConfig
@@ -69,7 +69,7 @@ public final class GlobalConfig {
 
     /**
      * @return The maximum number of check out retries.
-     * @see {@link com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder}
+     * @see com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder
      */
     public int getMaxCheckoutRetries() {
         return maxCheckoutRetries;
@@ -78,7 +78,7 @@ public final class GlobalConfig {
     /**
      * Sets maximum number of checkout retries.
      *
-     * @param maxCheckoutRetries
+     * @param maxCheckoutRetries Maximum number of checkout retries
      */
     public void setMaxCheckoutRetries(int maxCheckoutRetries) {
         this.maxCheckoutRetries = maxCheckoutRetries;

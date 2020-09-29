@@ -3,7 +3,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.rest;
 import net.sf.json.JSONObject;
 
 /**
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class RestResponse {
 

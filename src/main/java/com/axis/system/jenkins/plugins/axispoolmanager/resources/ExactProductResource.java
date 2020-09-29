@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Represents an exact product to check out.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  * @see <a href="http://staginglab.staging.rnd.axis.com/pool/">staginglab.staging.rnd.axis.com</a>
  */
 public final class ExactProductResource extends ResourceEntity {

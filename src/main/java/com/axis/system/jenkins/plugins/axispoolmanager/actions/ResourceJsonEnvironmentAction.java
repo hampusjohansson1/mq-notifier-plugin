@@ -19,7 +19,7 @@ import net.sf.json.JSONArray;
     ...
  * ]
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class ResourceJsonEnvironmentAction implements EnvironmentContributingAction {
     /**

@@ -3,7 +3,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.rest;
 /**
  * Important response data fields referenced from code.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class ResponseFields {
     /**
@@ -12,8 +12,8 @@ public final class ResponseFields {
     public static final String REFERENCE = "reference";
     /**
      * Used for grouping unique DUTs in exported environment variables.
-     * @see {@link com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder}
-     * @see {@link com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction}
+     * See {@link com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder}
+     * See {@link com.axis.system.jenkins.plugins.axispoolmanager.actions.AxisPoolParameterAction}
      */
     public static final String IDENTIFIER = "id";
     /**

@@ -22,6 +22,9 @@ public final class CheckOutDslExtension extends ContextExtensionPoint {
     /***
      * Entry point for the CheckOut DSL bindings.
      *
+     * @param resourceGroup The ResourceGroup to checkout
+     * @param leaseTime Time in hours to lease the resources for
+     * @param closure Closure to execute
      * @return {@link CheckOutBuilder} populated with Resource Entities {@link ResourceEntity}
      */
     @DslExtensionMethod(context = StepContext.class)

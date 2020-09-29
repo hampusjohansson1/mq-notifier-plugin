@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Parses the check in RESTApi response.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class RestCheckInResponseHandler implements ResponseHandler<RestResponse> {
     /**

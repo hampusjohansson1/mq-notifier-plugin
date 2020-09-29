@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * ResourceGroup allows structuring a group of Resources (DUTs)
  * together and linking them to the build that checked them out.
- * <p/>
+ * <p>
  * TODO: Make use of the groups to optimize check outs through a
  * all-or-nothing transaction using the Pool Management Interface
- * <p/>
+ * <p>
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class ResourceGroup {
     private final Run run;

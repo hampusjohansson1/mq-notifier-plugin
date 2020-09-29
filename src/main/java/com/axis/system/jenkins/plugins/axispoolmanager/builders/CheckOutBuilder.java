@@ -45,12 +45,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Build step for checking out DUTs from a lab. The ResourceEntities
  * in a group should only be checked out in as all-or-nothing.
- * <p/>
+ * <p>
  * If a DUT in a group cannot be checked out, all other DUTs should
  * be immediately returned. This negotiation should be moved as a
  * transaction in the Pool Manager.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class CheckOutBuilder extends Builder {
     private static final String UNKNOWN_USER_REFERENCE = "jenkins-unknown";
@@ -65,6 +65,7 @@ public final class CheckOutBuilder extends Builder {
      *
      * @param resourceGroupId The resource group id
      * @param resources       Resource entries from .jelly HetrogenList
+     * @param leaseTime       The time in hours to lease the resources
      */
     @DataBoundConstructor
     public CheckOutBuilder(int resourceGroupId, List<ResourceEntity> resources, int leaseTime) {
@@ -110,6 +111,7 @@ public final class CheckOutBuilder extends Builder {
      * @param build The build that wants to check out the resource.
      * @param listener The task listener used to log progress and errors.
      * @return A string describing the checked out resource if the check out was successful, null if not.
+     * @throws AbortException If the Jenkins job should stop executing
      */
     public String checkOutResource(Run build, TaskListener listener) throws AbortException {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();

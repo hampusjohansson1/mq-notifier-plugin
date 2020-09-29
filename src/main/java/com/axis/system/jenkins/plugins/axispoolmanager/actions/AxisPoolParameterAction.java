@@ -10,7 +10,7 @@ import java.util.List;
  * This action also provides a link to the build page to allow the user to see
  * all DUT check out meta data that was available during the build.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class AxisPoolParameterAction implements EnvironmentContributingAction {
     /**
@@ -59,7 +59,7 @@ public final class AxisPoolParameterAction implements EnvironmentContributingAct
     /**
      * Should this parameter action contribute environment variables?
      *
-     * @param enabled
+     * @param enabled Enable or disable contributing environment variables
      */
     public void setExportEnvVars(boolean enabled) {
         exportEnvVars = enabled;
@@ -89,10 +89,11 @@ public final class AxisPoolParameterAction implements EnvironmentContributingAct
      * Helper method to disable all environment variables with specified.
      * resource group id for build.
      *
-     * @param r the build
+     * @param run the build
+     * @param resourceGroupId the ID of the resource group
      */
-    public static void disableEnvVars(Run r, int resourceGroupId) {
-        for (AxisPoolParameterAction action : r.getActions(AxisPoolParameterAction.class)) {
+    public static void disableEnvVars(Run run, int resourceGroupId) {
+        for (AxisPoolParameterAction action : run.getActions(AxisPoolParameterAction.class)) {
             if (action.getResourceGroupId() == resourceGroupId) {
                 action.setExportEnvVars(false);
             }

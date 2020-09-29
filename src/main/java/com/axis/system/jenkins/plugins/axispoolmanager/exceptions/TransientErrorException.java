@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Something went wrong when checking in resources.
  *
- * @author Bekim Berisha <bekim.berisha@axis.com> (C) Axis 2015
+ * @author Bekim Berisha {@literal <bekim.berisha@axis.com>} (C) Axis 2015
  */
 public class TransientErrorException extends IOException {
     public TransientErrorException(String message, Throwable cause) {

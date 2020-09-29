@@ -34,10 +34,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Plugin main entry point.
- * <p/>
+ * <p>
  * TODO: Setup thread for building auto completion data on pool/product names.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class AxisResourceManager extends Plugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(AxisResourceManager.class);
@@ -47,9 +47,6 @@ public final class AxisResourceManager extends Plugin {
 
     /**
      * Returns the instance of this class.
-     * If {@link jenkins.model.Jenkins#getInstance()} isn't available
-     * or the plugin class isn't registered null will be returned.
-     *
      * @return the instance.
      */
     public static AxisResourceManager getInstance() {
@@ -66,11 +63,12 @@ public final class AxisResourceManager extends Plugin {
      *
      * @param resourceGroup Resource Group
      * @param userReference The user owning the resource
+     * @param leaseTime     Hours to lease the resourceGroup
      * @param envVars       hudson.EnvVars
      * @return true if successful
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws URISyntaxException On malformed URI
+     * @throws IOException On errors during checkout
+     * @throws InterruptedException On errors during checkout
      */
     public boolean checkOut(ResourceGroup resourceGroup, String userReference, int leaseTime, EnvVars envVars)
             throws URISyntaxException, IOException, InterruptedException {
@@ -236,7 +234,7 @@ public final class AxisResourceManager extends Plugin {
     }
 
     /**
-     * Used by the {@link AxisPoolManagement/index.jelly} page.
+     * Used by the AxisPoolManagement/index.jelly page.
      *
      * @return All currently checked out (or partly checked out) resources
      */

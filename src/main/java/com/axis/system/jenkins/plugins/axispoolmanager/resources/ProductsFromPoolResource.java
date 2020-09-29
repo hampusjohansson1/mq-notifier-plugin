@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Represents a checkout of a specific product from a pool.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  * @see <a href="http://staginglab.staging.rnd.axis.com/pool/">staginglab.staging.rnd.axis.com</a>
  */
 public final class ProductsFromPoolResource extends ResourceEntity {

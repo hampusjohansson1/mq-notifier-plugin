@@ -3,7 +3,7 @@ package com.axis.system.jenkins.plugins.axispoolmanager.rest;
 /**
  * Important request GET-parameters referenced from code.
  *
- * @author Gustaf Lundh <gustaf.lundh@axis.com> (C) Axis 2015
+ * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public final class RequestFields {
     /**
@@ -12,7 +12,7 @@ public final class RequestFields {
     public static final String SERVER_HOST = "server_host";
     /**
      * User that owns the build. Currently mapped to the BUILD_TAG.
-     * See {@link com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder)}
+     * See {@link com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder}
      */
     public static final String USER_REFERENCE = "user_reference";
     /**
