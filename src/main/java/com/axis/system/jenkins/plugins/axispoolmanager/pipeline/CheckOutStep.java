@@ -18,7 +18,6 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -127,7 +126,7 @@ public class CheckOutStep extends Step {
         private transient CheckOutStep step;
 
         @Inject
-        protected CheckOutStepExecution(@Nonnull StepContext context, CheckOutStep step) {
+        protected CheckOutStepExecution(StepContext context, CheckOutStep step) {
             super(context);
             this.step = step;
         }

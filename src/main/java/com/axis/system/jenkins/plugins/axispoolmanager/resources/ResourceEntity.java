@@ -1,9 +1,9 @@
 package com.axis.system.jenkins.plugins.axispoolmanager.resources;
 
 import com.axis.system.jenkins.plugins.axispoolmanager.exceptions.CheckOutException;
+import hudson.EnvVars;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
-import hudson.EnvVars;
 import net.sf.json.JSONObject;
 import org.apache.http.NameValuePair;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
  * @author Gustaf Lundh {@literal <gustaf.lundh@axis.com>} (C) Axis 2015
  */
 public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEntity> {
-    private JSONObject managerMetaData = new JSONObject();
+    private transient JSONObject managerMetaData;
     private boolean checkedOut = false;
     private final UUID correlationID = UUID.randomUUID();
 
@@ -27,12 +27,12 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
     /**
      * Ugh. Jenkins allows parallel jobs to share the same _instance_ of the checkout builder,
      * but we also need to use the ResourceEntities as a storage for meta data.
-     *
+     * <p>
      * I also want to avoid clone() which is discouraged since we lose control over derived
      * classes (Object already implements clone).
      *
-     * @see com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder
      * @return A copy of the ResourceEntity
+     * @see com.axis.system.jenkins.plugins.axispoolmanager.builders.CheckOutBuilder
      */
     public abstract ResourceEntity getCopy();
 
@@ -46,7 +46,12 @@ public abstract class ResourceEntity extends AbstractDescribableImpl<ResourceEnt
         this.managerMetaData = managerMetaData;
     }
 
-    public final JSONObject getManagerMetaData() { return managerMetaData; }
+    public final JSONObject getManagerMetaData() {
+        if (managerMetaData == null) {
+            managerMetaData = new JSONObject();
+        }
+        return managerMetaData;
+    }
 
     public final boolean isCheckedOut() {
         return checkedOut;

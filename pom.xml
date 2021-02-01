@@ -4,14 +4,13 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.37</version>
+        <version>4.15</version>
         <relativePath />
     </parent>
     <properties>
-        <jenkins.version>2.62</jenkins.version>
+        <jenkins.version>2.176.4</jenkins.version>
         <java.level>8</java.level>
         <jenkins-test-harness.version>2.38</jenkins-test-harness.version>
-        <!-- Need this due to commit message rules (default prefix start with non-alphanumeric char): -->
         <scmCommentPrefix>maven-release-plugin: </scmCommentPrefix>
     </properties>
     <groupId>com.axis.system.jenkins.plugins</groupId>
@@ -88,7 +87,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.11</version>
+            <version>2.4.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -99,11 +98,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>findbugs</artifactId>
-            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
