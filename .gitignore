@@ -8,3 +8,4 @@ work
 .vscode/
 pom.xml.releaseBackup
 release.properties
+.factorypath

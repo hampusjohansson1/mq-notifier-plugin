@@ -113,6 +113,7 @@ public final class CheckOutBuilder extends Builder {
      * @return A string describing the checked out resource if the check out was successful, null if not.
      * @throws AbortException If the Jenkins job should stop executing
      */
+    @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
     public String checkOutResource(Run build, TaskListener listener) throws AbortException {
         AxisResourceManager axisResourceManager = AxisResourceManager.getInstance();
         if (axisResourceManager == null) {
